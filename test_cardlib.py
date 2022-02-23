@@ -1,6 +1,5 @@
 from enum import Enum
 import pytest
-
 from cardlib import *
 
 
@@ -18,19 +17,43 @@ def test_cards():
     with pytest.raises(TypeError):
         pc = PlayingCard(Suit.Clubs)
 
+    ha = AceCard(Suit.Hearts)
+    assert ha.get_value() == 14
+
+    sa = AceCard(Suit.Spades)
+    assert not ha == sa
+
+    cj = JackCard(Suit.Clubs)
+    assert cj.get_value() == 11
+
+    cq = QueenCard(Suit.Clubs)
+    assert cq.get_value() == 12
+    assert cj < cq
+    assert cj.suit == cq.suit
+
+    assert repr(cq) == 'Queen of Clubs'
+
 
 # This test assumes you call your shuffle method "shuffle" and the method to draw a card "draw"
 def test_deck():
     d = StandardDeck()
+    assert len(d.cards) == 52
     c1 = d.draw()
     c2 = d.draw()
+    assert len(d.cards) == 50
     assert not c1 == c2
+    assert repr(c1) == 'Ace of Diamonds'
 
     d2 = StandardDeck()
     d2.shuffle()
     c3 = d2.draw()
     c4 = d2.draw()
     assert not ((c3, c4) == (c1, c2))
+
+    d3 = StandardDeck()
+    d3.shuffle()
+    c5 = d3.draw()
+    assert c5 not in d3.cards
 
 
 # This test builds on the assumptions above and assumes you store the cards in the hand in the list "cards",
@@ -56,11 +79,16 @@ def test_hand():
     assert len(h.cards) == 2
     assert h.cards[0] == cards[2]
     assert h.cards[1] == cards[4]
+    q = Hand()
+    q.add_card(NumberedCard(4, Suit.Hearts))
+    q.add_card(JackCard(Suit.Hearts))
+    assert repr(q) == 'hand with cards: [4 of Hearts, Jack of Hearts]'
 
 
 # This test builds on the assumptions above. Add your type and data for the commented out tests
 # and uncomment them!
 def test_pokerhands():
+
     h1 = Hand()
     h1.add_card(QueenCard(Suit.Diamonds))
     h1.add_card(KingCard(Suit.Hearts))
@@ -75,8 +103,8 @@ def test_pokerhands():
     ph1 = h1.best_poker_hand(cl)
     assert isinstance(ph1, PokerHand)
     ph2 = h2.best_poker_hand(cl)
-    # assert # Check ph1 handtype class and data here>
-    # assert # Check ph2 handtype class and data here>
+    assert ph1.name == 'High_cards' and max(ph1.secondary) == 13
+    assert ph2.name == 'High_cards' and max(ph2.secondary) == 14
 
     assert ph1 < ph2
 
@@ -87,9 +115,22 @@ def test_pokerhands():
     assert ph3 < ph4
     assert ph1 < ph2
 
-    # assert # Check ph3 handtype class and data here>
-    # assert # Check ph4 handtype class and data here>
+    assert repr(ph3) == 'Pair of 12 with highest cards [13, 9, 8]'
+    assert repr(ph4) == 'Pair of 12 with highest cards [14, 9, 8]'
 
     cl = [QueenCard(Suit.Clubs), QueenCard(Suit.Spades), KingCard(Suit.Clubs), KingCard(Suit.Spades)]
     ph5 = h1.best_poker_hand(cl)
-    # assert # Check ph5 handtype class and data here>
+    assert repr(ph5) == 'Full House with threes in 13 and pair in 12'
+
+    h3 = Hand()
+    h3.add_card(KingCard(Suit.Diamonds))
+    h3.add_card(KingCard(Suit.Hearts))
+    bph3 = h3.best_poker_hand(None)
+
+    h4 = Hand()
+    h4.add_card(KingCard(Suit.Clubs))
+    h4.add_card(KingCard(Suit.Spades))
+    bph4 = h4.best_poker_hand(None)
+
+    assert bph4 == bph3
+    assert repr(bph3) == 'Pair of 13 with highest cards []'
