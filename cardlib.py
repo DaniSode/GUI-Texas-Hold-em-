@@ -1,4 +1,4 @@
-# DAT-171: Computer assignment 3
+# DAT-171: Computer assignment 2
 # Authors: Daniel Soderqvist and Felix Mare
 
 
@@ -11,7 +11,6 @@ from collections import Counter
 class Suit(Enum):
     """An Enum-class representing the suits of playing cards.
     """
-
     Hearts = 1
     Spades = 2
     Clubs = 3
@@ -38,37 +37,30 @@ class PlayingCard(ABC):
 
     def __lt__(self, other):
         if self.get_value() == other.get_value():
-            return self.suit.value > other.suit.value
+            return self.suit.value < other.suit.value
 
         return self.get_value() < other.get_value()
-
-    def __repr__(self):
-        if type(self) == JackCard:
-            return f'Jack of {self.suit.name}'
-        elif type(self) == QueenCard:
-            return f'Queen of {self.suit.name}'
-        elif type(self) == KingCard:
-            return f'King of {self.suit.name}'
-        elif type(self) == AceCard:
-            return f'Ace of {self.suit.name}'
-        else:
-            return f'{self.get_value()} of {self.suit.name}'
 
 
 class NumberedCard(PlayingCard):
     """A subclass of PlayingCard representing a numbered card.
 
-        :param value: The desired number or value of the card.
+        :param value: The desired number or value of the card. Must be be between 2 and 10.
         :type value: int
         :param suit: The desired suit of the card.
         :type suit: Suit
         """
     def __init__(self, value, suit):
         super().__init__(suit)
+        if value < 2 or value > 10:
+            raise TypeError('A numbered card must have a value between 2 and 10.')
         self.value = value
 
     def get_value(self):
         return self.value
+
+    def __repr__(self):
+        return f'{self.get_value()} of {self.suit.name}'
 
 
 class JackCard(PlayingCard):
@@ -83,6 +75,9 @@ class JackCard(PlayingCard):
     def get_value(self):
         return 11
 
+    def __repr__(self):
+        return f'Jack of {self.suit.name}'
+
 
 class QueenCard(PlayingCard):
     """A subclass of PlayingCard representing a queen card.
@@ -95,6 +90,9 @@ class QueenCard(PlayingCard):
 
     def get_value(self):
         return 12
+
+    def __repr__(self):
+        return f'Queen of {self.suit.name}'
 
 
 class KingCard(PlayingCard):
@@ -109,6 +107,9 @@ class KingCard(PlayingCard):
     def get_value(self):
         return 13
 
+    def __repr__(self):
+        return f'King of {self.suit.name}'
+
 
 class AceCard(PlayingCard):
     """A subclass of PlayingCard representing an ace card.
@@ -122,6 +123,9 @@ class AceCard(PlayingCard):
     def get_value(self):
         return 14
 
+    def __repr__(self):
+        return f'Ace of {self.suit.name}'
+
 
 class StandardDeck:
     """A class representing a standard 52-card deck. Generates a full deck when creating an instance.
@@ -129,19 +133,18 @@ class StandardDeck:
         :param cards: A list with cards that make up the deck.
         :type cards: list
             """
-    def __init__(self, cards=None):
-        if cards is None:
-            cards = []
-        self.cards = cards
+    def __init__(self):
+
+        self.cards = []
 
         for value in range(2,11):
             for suit in Suit:
-                cards.append(NumberedCard(value, suit))
+                self.cards.append(NumberedCard(value, suit))
         for suit in Suit:
-            cards.append(JackCard(suit))
-            cards.append(QueenCard(suit))
-            cards.append(KingCard(suit))
-            cards.append(AceCard(suit))
+            self.cards.append(JackCard(suit))
+            self.cards.append(QueenCard(suit))
+            self.cards.append(KingCard(suit))
+            self.cards.append(AceCard(suit))
 
     def shuffle(self):
         """A method that randomizes the order of cards in the deck.
@@ -154,7 +157,7 @@ class StandardDeck:
             :returns: The top card in the deck.
             :rtype: PlayingCard
                 """
-        return list.pop(self.cards)
+        return self.cards.pop()
 
     def __repr__(self):
         return f'Standard deck with cards: {self.cards}'
@@ -166,11 +169,9 @@ class Hand:
         :param cards: A list with cards that make up the hand.
         :type cards: list
             """
-    def __init__(self, cards=None):
+    def __init__(self):
 
-        if cards is None:
-            cards = []
-        self.cards = cards
+        self.cards = []
 
     def add_card(self, card):
         """A method that adds a card to the hand.
@@ -194,37 +195,18 @@ class Hand:
         """
         self.cards.sort()
 
-    def best_poker_hand(self, cards):
-        """A method finding out which card combination is the best.
+    def best_poker_hand(self, cards: list[PlayingCard] = []):
+        """A method returning a PokerHand object which can be used for comparison.
 
-            :param cards: Additionally cards that combines the player's hand.
+            :param cards: Additional cards that combines the player's hand.
             :type cards: list
-            :return: The player's best poker hand including hierarchy and secondary dependent variables.
+            :return: A PokerHand object containing the type and secondary variables needed to distinguish multiple hands
+             from each other.
             :rtype: PokerHand
                 """
-        check_funcs = [PokerHand.check_straight_flush,
-                       PokerHand.check_four_of_a_kind,
-                       PokerHand.check_full_house,
-                       PokerHand.check_flush,
-                       PokerHand.check_straight,
-                       PokerHand.check_three_of_a_kind,
-                       PokerHand.check_two_pairs,
-                       PokerHand.check_pair,
-                       PokerHand.high_cards]
+        all_cards = self.cards + cards
 
-        all_cards = list(self.cards)
-        if cards is not None:
-            all_cards += cards
-            all_cards.sort()
-
-        for fn in check_funcs:
-
-            check = fn(all_cards)
-
-            if check is not None:
-                hierarchy, secondary = fn(all_cards)
-
-                return PokerHand(hierarchy, secondary, all_cards)
+        return PokerHand(all_cards)
 
     def __repr__(self):
 
@@ -234,7 +216,6 @@ class Hand:
 class PokerHierarchy(Enum):
     """An Enum-class representing all poker hands and their hierarchy.
     """
-
     Straight_Flush = 9
     Four_of_a_Kind = 8
     Full_House = 7
@@ -248,22 +229,37 @@ class PokerHierarchy(Enum):
 
 class PokerHand:
     """
-    A class representing a poker hand that contains all attributes required to distinguish one poker hand from another.
+    A class representing a poker hand that creates all attributes required to distinguish one poker hand from another.
 
-    :param type: The type of PokerHand
-    :type type: PokerHierarchy
-    :param secondary: A tuple containing the relevant values to compare two hands of the same type.
-    :type secondary: Tuple
     :param cards: All the cards in the poker hand.
     :type cards: list of PlayingCard
     """
-    def __init__(self, type, secondary, cards):
 
-        self.type = type
-        self.name = type.name
-        self.hierarchy = type.value
-        self.secondary = secondary
+    def __init__(self, cards):
         self.cards = cards
+
+        check_funcs = [self.check_straight_flush,
+                       self.check_four_of_a_kind,
+                       self.check_full_house,
+                       self.check_flush,
+                       self.check_straight,
+                       self.check_three_of_a_kind,
+                       self.check_two_pairs,
+                       self.check_pair,
+                       self.high_cards]
+
+        self.cards.sort()
+
+        for fn in check_funcs:
+
+            check = fn(self.cards)
+
+            if check is not None:
+                self.type, self.secondary = fn(self.cards)
+                break
+
+        self.name = self.type.name
+        self.hierarchy = self.type.value
 
     @staticmethod
     def check_straight_flush(cards):
@@ -303,9 +299,14 @@ class PokerHand:
             value_count[c.get_value()] += 1
 
         fours = [v[0] for v in value_count.items() if v[1] >= 4]
-
+        highest_card = None
         if fours:
-            return PokerHierarchy.Four_of_a_Kind, fours
+            for i in reversed(cards):
+                if i.get_value() != fours[-1]:
+                    highest_card = i.get_value()
+                    break
+        if fours:
+            return PokerHierarchy.Four_of_a_Kind, (fours[-1], highest_card)
 
     @staticmethod
     def check_full_house(cards):
@@ -406,9 +407,16 @@ class PokerHand:
             value_count[c.get_value()] += 1
 
         threes = [v[0] for v in value_count.items() if v[1] >= 3]
-
+        highest_card = None
+        highest_cards = []
+        value_count_2 = 0
         if threes:
-            return PokerHierarchy.Three_of_a_Kind, threes[-1]
+            for i in reversed(cards):
+                if i.get_value() != threes[-1] and value_count_2 < 2:
+                    highest_cards.append(i.get_value())
+                    value_count_2 += 1
+        if threes:
+            return PokerHierarchy.Three_of_a_Kind, (threes[-1], highest_cards)
 
     @staticmethod
     def check_two_pairs(cards):
@@ -420,7 +428,6 @@ class PokerHand:
             :return: If two pairs are found: PokerHierarchy object, kind of two pairs and remaining highest card. Else: None
             :rtype: tuple
                 """
-
         value_count = Counter()
         for c in cards:
             value_count[c.get_value()] += 1
@@ -486,7 +493,7 @@ class PokerHand:
             return f'{self.name.replace("_"," ")} of {self.secondary[-1]} with highest card {self.secondary[0]}'
 
         elif self.hierarchy == PokerHierarchy.Four_of_a_Kind.value:
-            return f'{self.name} with {self.secondary}'
+            return f'{self.name.replace("_", " ")} with fours in {self.secondary[0]} and highest card {self.secondary[1]}'
 
         elif self.hierarchy == PokerHierarchy.Full_House.value:
             return f'{self.name.replace("_", " ")} with threes in {self.secondary[0]} and pair in {self.secondary[1]}'
@@ -498,7 +505,7 @@ class PokerHand:
             return f'{self.name.replace("_", " ")} with highest card {self.secondary}'
 
         elif self.hierarchy == PokerHierarchy.Three_of_a_Kind.value:
-            return f'{self.name.replace("_", " ")} of {self.secondary}'
+            return f'{self.name.replace("_", " ")} of {self.secondary[0]} and highest cards {self.secondary[-1]}'
 
         elif self.hierarchy == PokerHierarchy.Two_Pairs.value:
             return f'{self.name.replace("_", " ")} of {self.secondary[0]} and {self.secondary[1]} with highest card {self.secondary[2]}'
@@ -518,39 +525,3 @@ class PokerHand:
             return self.secondary < other.secondary
         else:
             return self.hierarchy < other.hierarchy
-
-
-# The following code is a testrun of the library. The result is printed in the terminal.
-
-hA = Hand()
-hB = Hand()
-
-d = StandardDeck()
-d.shuffle()
-
-hA.add_card(d.draw())
-hA.add_card(d.draw())
-
-hB.add_card(d.draw())
-hB.add_card(d.draw())
-
-cards = [d.draw(), d.draw(), d.draw(), d.draw(), d.draw()]
-
-A = hA.best_poker_hand(cards)
-B = hB.best_poker_hand(cards)
-
-print(f'Player A has a {hA}')
-print(f'Player B has a {hB}')
-print(f'Cards on the table: {cards}\n')
-
-print(f'Player A has {A}')
-print(f'Player B has {B}\n')
-
-if A > B:
-    print('Winner is player A')
-elif B > A:
-    print('Winner is player B')
-else:
-    print('Split pot')
-
-

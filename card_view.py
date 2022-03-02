@@ -4,6 +4,7 @@ from PyQt5.QtSvg import *
 from PyQt5.QtWidgets import *
 from abc import abstractmethod
 import sys
+from cardlib import *
 
 # NOTE: This is just given as an example of how to use CardView.
 # It is expected that you will need to adjust things to make a game out of it. 
