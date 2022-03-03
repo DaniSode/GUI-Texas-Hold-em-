@@ -12,6 +12,7 @@ import sys
 # Models
 ###################
 
+app = QApplication(sys.argv)
 class CardModel(QObject):
     """ Base class that described what is expected from the CardView widget """
 
@@ -288,9 +289,10 @@ class ActionsView(QHBoxLayout):
 
 
 class InformationView(QVBoxLayout):
-    def __init__(self):
+    def __init__(self, text):
         super().__init__()
-        text = QLabel('Vad de ska stå')
+        self.text = text
+        text = QLabel(self.text)
         text.setFrameStyle(QFrame.Panel | QFrame.Raised)
         text.setAlignment(Qt.AlignCenter)
         screen = app.primaryScreen()
@@ -302,7 +304,7 @@ class InformationView(QVBoxLayout):
 class MainGameWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle('Poopy Poker')
+        self.setWindowTitle("Texas Hold'em")
         self.setStyleSheet('background-image: url(cards/table.png);')
 
         # Lower row
@@ -316,7 +318,7 @@ class MainGameWindow(QMainWindow):
         h_lay = QVBoxLayout()
         h_lay.addLayout(PotInformation())
         h_lay.addStretch(1)
-        h_lay.addLayout(InformationView())
+        h_lay.addLayout(InformationView("Player 1's turn"))
         h_lay.addStretch(1)
         h_lay.addLayout(ActionsView())
         h_layout.addLayout(h_lay)
@@ -334,12 +336,13 @@ class MainGameWindow(QMainWindow):
         # Upper row
         h_layout3 = QHBoxLayout()
         h_layout3.addStretch(1)
-        h_layout3.addLayout(InformationView())
+        h_layout3.addLayout(InformationView("Welcome to Texas Hold'em"))
         h_layout3.addStretch(1)
 
         # Add all layouts vertically
         main_vertical = QVBoxLayout()
         main_vertical.addLayout(h_layout3)
+        main_vertical.addStretch(1)
         main_vertical.addLayout(h_layout2)
         main_vertical.addStretch(1)
         main_vertical.addLayout(h_layout)
@@ -347,9 +350,3 @@ class MainGameWindow(QMainWindow):
         widget = QWidget()
         widget.setLayout(main_vertical)
         self.setCentralWidget(widget)
-
-
-app = QApplication(sys.argv)
-window = MainGameWindow()
-window.show()
-app.exec_()
