@@ -230,6 +230,21 @@ class PlayerCard(QWidget):
         self.setLayout(box)
 
 
+class PlayerView(QHBoxLayout):
+    def __init__(self, player_name):
+        super().__init__()
+        self.player_name = player_name
+        self.addWidget(PlayerCard())
+        self.addLayout(PlayerInformation(player_name))
+
+
+# class Player2View(QHBoxLayout):
+#     def __init__(self, player_name):
+#         super().__init__()
+#         self.player_name = player_name
+#         self.addLayout(PlayerInformation(player_name))
+#         self.addWidget(PlayerCard())
+
 
 #Måste definiera input pot
 
@@ -292,8 +307,9 @@ class MainGameWindow(QMainWindow):
 
         # Lower row
         h_layout = QHBoxLayout()
-        # h_layout.addWidget(self.CardWidget())
-        h_layout.addLayout(PlayerView('Player 1'))
+
+        # Lower left row
+        h_layout.addLayout(PlayerView('Queen Daniel'))
         h_layout.addStretch(1)
 
         # Lower middle row
