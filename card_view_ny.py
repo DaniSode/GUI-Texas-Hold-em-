@@ -195,18 +195,107 @@ class CardView(QGraphicsView):
 ###################
 # Main test program
 ###################
+class DisplayBox(QLineEdit):
+    def __init__(self, label):
+        super().__init__()
+        self.label = label
+        self.setText(f'{self.label}')
+        self.setReadOnly(True)
+        self.setAlignment(Qt.AlignCenter)
+        self.setStyleSheet("padding: 3px 0px;")
+class PlayerView(QVBoxLayout):
+    def __init__(self, player_name):
+        super().__init__()
+        self.player_name = player_name
+        self.setSpacing(0)
+        widgets = [DisplayBox(f'{self.player_name}'), DisplayBox('test'), DisplayBox('test'), QPushButton('Flip cards')]
+        for widget in widgets:
+            self.addWidget(widget)
+
+
+
+
+class TableView(QWidget): #Skall pot inkluderas här?
+    def __init__(self):
+        super().__init__()
+
+class ActionsView(QWidget):
+    def __init__(self):
+        super().__init__()
+
+class InformationView(QWidget):
+    def __init__(self):
+        super().__init__()
+
+class MainGameWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle('Poopy Poker')
+        self.setStyleSheet('background-image: url(cards/table.png);')
+
+        # Lower left row
+        h_layout = QHBoxLayout()
+        # h_layout.addWidget(self.CardWidget())
+        h_layout.addLayout(PlayerView('Player 1'))
+        h_layout.addStretch(1)
+        #
+        # # Lower middle row
+        # h_lay = QVBoxLayout()
+        # h_lay.addLayout(self.PotInformation())
+        # h_lay.addStretch(1)
+        # h_lay.addLayout(self.PokerInteraction())
+        # h_layout.addLayout(h_lay)
+        #
+        # # Lower right row
+        # h_layout.addStretch(1)
+        # h_layout.addLayout(self.PlayerInterface())
+        # h_layout.addWidget(self.CardWidget())
+        #
+        # # Middle row
+        # h_layout2 = QHBoxLayout()
+        # h_layout2.addStretch(1)
+        # h_layout2.addWidget(self.TableWidget())
+        # h_layout2.addStretch(1)
+        #
+        # # Upper row
+        # h_layout3 = QHBoxLayout()
+        # h_layout3.addStretch(1)
+        # h_layout3.addLayout(self.GeneralInformation())
+        # h_layout3.addStretch(1)
+        #
+        # # Add all layouts vertically
+        # main_vertical = QVBoxLayout()
+        # main_vertical.addLayout(h_layout3)
+        # main_vertical.addLayout(h_layout2)
+        # main_vertical.addStretch(1)
+        # main_vertical.addLayout(h_layout)
+
+        widget = QWidget()
+        widget.setLayout(h_layout)
+        self.setCentralWidget(widget)
+
+
+
+
+
+
 
 # Lets test it out
 app = QApplication(sys.argv)
-hand = HandModel()
+# hand = HandModel()
+#
+# card_view = CardView(hand)
+#
+# # Creating a small demo window to work with, and put the card_view inside:
+# box = QVBoxLayout()
+# box.addWidget(card_view)
+# player_view = QGroupBox("Player 1")
+# player_view.setLayout(box)
+# player_view.show()
 
-card_view = CardView(hand)
+window = MainGameWindow()
+window.showMaximized()
 
-# Creating a small demo window to work with, and put the card_view inside:
-box = QVBoxLayout()
-box.addWidget(card_view)
-player_view = QGroupBox("Player 1")
-player_view.setLayout(box)
-player_view.show()
+
 
 app.exec_()
