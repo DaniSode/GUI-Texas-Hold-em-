@@ -216,7 +216,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.setWindowTitle('Poopy Poker')
-        self.setStyleSheet('background-image: url(cards/Table.png);')
+        self.setStyleSheet('background-image: url(cards/table.png);')
 
         #Lower left row
         h_layout = QHBoxLayout()
@@ -320,7 +320,7 @@ class MainWindow(QMainWindow):
         horizontal_layout = QHBoxLayout()
         sld = QLineEdit()
         sld.setValidator(QIntValidator())
-
+        sld.setStyleSheet("padding: 2px 0px;")
         buttons = [QPushButton('Check/Call'),
                    QPushButton('Fold'),
                    QPushButton('Raise/Bet'),
@@ -373,6 +373,7 @@ class MainWindow(QMainWindow):
 ###################
 
 # Lets test it out
+
 app = QApplication(sys.argv)
 
 # hand = HandModel()
