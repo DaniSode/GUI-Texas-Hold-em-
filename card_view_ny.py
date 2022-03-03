@@ -39,7 +39,7 @@ class MySimpleCard:
 class Hand:
     def __init__(self):
         # Lets use some hardcoded values for most of this to start with
-        self.cards = [MySimpleCard(13, 2), MySimpleCard(7, 0), MySimpleCard(13, 1)]
+        self.cards = [MySimpleCard(13, 2), MySimpleCard(7, 0), MySimpleCard(13, 1), MySimpleCard(13, 3), MySimpleCard(7, 3)]
 
     def add_card(self, card):
         self.cards.append(card)
@@ -81,8 +81,8 @@ class TableScene(QGraphicsScene):
     """ A scene with a table cloth background """
     def __init__(self):
         super().__init__()
-        self.tile = QPixmap('cards/table.png')
-        self.setBackgroundBrush(QBrush(self.tile))
+        # self.tile = QPixmap('cards/table.png')
+        # self.setBackgroundBrush(QBrush(self.tile))
 
 
 class CardItem(QGraphicsSvgItem):
@@ -203,29 +203,86 @@ class DisplayBox(QLineEdit):
         self.setReadOnly(True)
         self.setAlignment(Qt.AlignCenter)
         self.setStyleSheet("padding: 3px 0px;")
-class PlayerView(QVBoxLayout):
+        screen = app.primaryScreen()
+        self.setFixedWidth(int(screen.size().width() * 0.05))
+
+
+#Ändra inputs
+class PlayerInformation(QVBoxLayout):
     def __init__(self, player_name):
         super().__init__()
         self.player_name = player_name
         self.setSpacing(0)
-        widgets = [DisplayBox(f'{self.player_name}'), DisplayBox('test'), DisplayBox('test'), QPushButton('Flip cards')]
+        widgets = [DisplayBox(f'{self.player_name}'), DisplayBox('Money: Input'), DisplayBox('Bet: Input'), QPushButton('Flip cards')]
         for widget in widgets:
             self.addWidget(widget)
 
 
-
-
-class TableView(QWidget): #Skall pot inkluderas här?
+class PlayerCard(QWidget):
     def __init__(self):
         super().__init__()
+        hand = HandModel()
+        card_view = CardView(hand)
+        box = QHBoxLayout()
+        box.addWidget(card_view)
+        screen = app.primaryScreen()
+        self.setFixedSize(int(screen.size().width()*0.246), int(screen.size().height()*0.3))
+        self.setLayout(box)
 
-class ActionsView(QWidget):
+
+
+#Måste definiera input pot
+
+
+class PotInformation(QVBoxLayout):
     def __init__(self):
         super().__init__()
+        pot_label = QLabel('Pot')
+        pot_label.setAlignment(Qt.AlignCenter)
+        amount_button = DisplayBox('1000')
+        self.addWidget(pot_label)
+        self.addWidget(amount_button)
+        self.setAlignment(Qt.AlignCenter)
 
-class InformationView(QWidget):
+
+#Måste ändra input
+class TableView(QWidget):
     def __init__(self):
         super().__init__()
+        hand = HandModel()
+        card_view = CardView(hand)
+        box = QHBoxLayout()
+        box.addWidget(card_view)
+        screen = app.primaryScreen()
+        self.setFixedSize(int(screen.size().width() * 0.6), int(screen.size().height() * 0.3))
+        self.setLayout(box)
+
+
+#Måste fixa bet input
+class ActionsView(QHBoxLayout):
+    def __init__(self):
+        super().__init__()
+        actions = DisplayBox('')
+        actions.setReadOnly(False)
+        buttons = [QPushButton('Check/Call'),
+                   QPushButton('Fold'),
+                   QPushButton('Raise/Bet'),
+                   actions]
+        for button in buttons:
+            self.addWidget(button)
+
+
+class InformationView(QVBoxLayout):
+    def __init__(self):
+        super().__init__()
+        text = QLabel('Vad de ska stå')
+        text.setFrameStyle(QFrame.Panel | QFrame.Raised)
+        text.setAlignment(Qt.AlignCenter)
+        screen = app.primaryScreen()
+        text.setFixedSize(int(screen.size().width() * 0.1), int(screen.size().height() * 0.1))
+        self.setAlignment(Qt.AlignCenter)
+        self.addWidget(text)
+
 
 class MainGameWindow(QMainWindow):
     def __init__(self):
@@ -233,69 +290,50 @@ class MainGameWindow(QMainWindow):
         self.setWindowTitle('Poopy Poker')
         self.setStyleSheet('background-image: url(cards/table.png);')
 
-        # Lower left row
+        # Lower row
         h_layout = QHBoxLayout()
         # h_layout.addWidget(self.CardWidget())
         h_layout.addLayout(PlayerView('Player 1'))
         h_layout.addStretch(1)
-        #
-        # # Lower middle row
-        # h_lay = QVBoxLayout()
-        # h_lay.addLayout(self.PotInformation())
-        # h_lay.addStretch(1)
-        # h_lay.addLayout(self.PokerInteraction())
-        # h_layout.addLayout(h_lay)
-        #
-        # # Lower right row
-        # h_layout.addStretch(1)
-        # h_layout.addLayout(self.PlayerInterface())
-        # h_layout.addWidget(self.CardWidget())
-        #
-        # # Middle row
-        # h_layout2 = QHBoxLayout()
-        # h_layout2.addStretch(1)
-        # h_layout2.addWidget(self.TableWidget())
-        # h_layout2.addStretch(1)
-        #
-        # # Upper row
-        # h_layout3 = QHBoxLayout()
-        # h_layout3.addStretch(1)
-        # h_layout3.addLayout(self.GeneralInformation())
-        # h_layout3.addStretch(1)
-        #
-        # # Add all layouts vertically
-        # main_vertical = QVBoxLayout()
-        # main_vertical.addLayout(h_layout3)
-        # main_vertical.addLayout(h_layout2)
-        # main_vertical.addStretch(1)
-        # main_vertical.addLayout(h_layout)
+
+        # Lower middle row
+        h_lay = QVBoxLayout()
+        h_lay.addLayout(PotInformation())
+        h_lay.addStretch(1)
+        h_lay.addLayout(InformationView())
+        h_lay.addStretch(1)
+        h_lay.addLayout(ActionsView())
+        h_layout.addLayout(h_lay)
+
+        # Lower right row
+        h_layout.addStretch(1)
+        h_layout.addLayout(PlayerView('King Felix'))
+
+        # Middle row
+        h_layout2 = QHBoxLayout()
+        h_layout2.addStretch(1)
+        h_layout2.addWidget(TableView())
+        h_layout2.addStretch(1)
+
+        # Upper row
+        h_layout3 = QHBoxLayout()
+        h_layout3.addStretch(1)
+        h_layout3.addLayout(InformationView())
+        h_layout3.addStretch(1)
+
+        # Add all layouts vertically
+        main_vertical = QVBoxLayout()
+        main_vertical.addLayout(h_layout3)
+        main_vertical.addLayout(h_layout2)
+        main_vertical.addStretch(1)
+        main_vertical.addLayout(h_layout)
 
         widget = QWidget()
-        widget.setLayout(h_layout)
+        widget.setLayout(main_vertical)
         self.setCentralWidget(widget)
 
 
-
-
-
-
-
-# Lets test it out
 app = QApplication(sys.argv)
-# hand = HandModel()
-#
-# card_view = CardView(hand)
-#
-# # Creating a small demo window to work with, and put the card_view inside:
-# box = QVBoxLayout()
-# box.addWidget(card_view)
-# player_view = QGroupBox("Player 1")
-# player_view.setLayout(box)
-# player_view.show()
-
 window = MainGameWindow()
-window.showMaximized()
-
-
-
+window.show()
 app.exec_()
