@@ -41,15 +41,10 @@ class MySimpleCard:
 class Hand:
     def __init__(self):
         # Lets use some hardcoded values for most of this to start with
-        self.cards = [MySimpleCard(13, 2), MySimpleCard(7, 0)]
+        self.cards = [MySimpleCard(14, 2), MySimpleCard(7, 0)]
 
     def add_card(self, card):
         self.cards.append(card)
-
-class Table:
-    def __init__(self):
-        # Lets use some hardcoded values for most of this to start with
-        self.cards = [MySimpleCard(13, 2), MySimpleCard(7, 0), MySimpleCard(8, 0), MySimpleCard(10, 0), MySimpleCard(11, 0)]
 
 
 # We can extend this class to create a model, which updates the view whenever it has changed.
@@ -79,16 +74,6 @@ class HandModel(Hand, CardModel):
     def add_card(self, card):
         super().add_card(card)
         self.new_cards.emit()  # something changed, better emit the signal!
-
-class HandModel_Table(Table, CardModel):
-    def __init__(self):
-        Table.__init__(self)
-        CardModel.__init__(self)
-        # Additional state needed by the UI
-        self.flipped_cards = False
-
-    def __iter__(self):
-        return iter(self.cards)
 
 ###################
 # Card widget code:
@@ -217,8 +202,8 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super(MainWindow, self).__init__()
-        self.MainWindow = QPixmap('cards/table.png')
-        self.setWindowTitle('Poopy Poker')
+        self.setGeometry(50,50,1000,500)
+        self.setWindowTitle('Poker')
 
         #Lower row
         h_layout = QHBoxLayout()
@@ -229,26 +214,21 @@ class MainWindow(QMainWindow):
 
         #Middle row
         h_layout2 = QHBoxLayout()
-        h_layout2.addStretch(1)
-        h_layout2.addWidget(self.TableWidget())
-        h_layout2.addStretch(1)
-
+        h_layout2.addWidget(self.CardWidget())
 
 
         #Upper row
         h_layout3 = QHBoxLayout()
-        h_layout3.addStretch(1)
         h_layout3.addLayout(self.GeneralInformation())
+        #h_layout3.addStretch(1)
         h_layout3.addLayout(self.PotInformation())
-        h_layout3.addStretch(1)
+        #h_layout3.alignment(AlignCenter)
         h_layout3.addLayout(self.PokerInteraction())
 
         #Add all layouts vertically
         main_vertical = QVBoxLayout()
         main_vertical.addLayout(h_layout3)
-        main_vertical.addStretch(1)
         main_vertical.addLayout(h_layout2)
-        main_vertical.addStretch(1)
         main_vertical.addLayout(h_layout)
 
 
@@ -268,18 +248,6 @@ class MainWindow(QMainWindow):
 
         return player_view
 
-    def TableWidget(self):
-
-        hand = HandModel_Table()
-        card_view = CardView(hand)
-        box = QHBoxLayout()
-        box.addWidget(card_view)
-
-        player_view = QWidget()
-        player_view.setFixedSize(2550, 700)
-        player_view.setLayout(box)
-
-        return player_view
 
     def PlayerInterface(self):
 
@@ -323,17 +291,18 @@ class MainWindow(QMainWindow):
         #
         pot_label = QLabel('pot')
         pot_label.setAlignment(Qt.AlignCenter)
-        amount_button = QPushButton('100')
+        amount_label = QLineEdit()
+        amount_label.setReadOnly(True)
 
         vertical_layout.addWidget(pot_label)
-        vertical_layout.addWidget(amount_button)
+        vertical_layout.addWidget(amount_label)
 
         return vertical_layout
 
     def GeneralInformation(self):
 
         vertical_layout = QVBoxLayout()
-        text = QLabel('Vad de ska stå')
+        text = QLabel('This is a session of poker its very fun')
         text.setFrameStyle(QFrame.Panel | QFrame.Raised)
         vertical_layout.addWidget(text)
 
@@ -361,7 +330,7 @@ app = QApplication(sys.argv)
 # player_view.show()
 
 window = MainWindow()
-window.showMaximized()
+window.show()
 
 
 app.exec_()
