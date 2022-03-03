@@ -4,6 +4,7 @@ from PyQt5.QtSvg import *
 from PyQt5.QtWidgets import *
 from abc import abstractmethod
 import sys
+import cardlib
 from cardlib import *
 
 # NOTE: This is just given as an example of how to use CardView.
@@ -46,6 +47,11 @@ class Hand:
     def add_card(self, card):
         self.cards.append(card)
 
+class Table:
+    def __init__(self):
+        # Lets use some hardcoded values for most of this to start with
+        self.cards = [MySimpleCard(13, 2), MySimpleCard(7, 0), MySimpleCard(8, 0), MySimpleCard(10, 0), MySimpleCard(11, 0)]
+
 
 # We can extend this class to create a model, which updates the view whenever it has changed.
 # NOTE: You do NOT have to do it this way.
@@ -74,6 +80,16 @@ class HandModel(Hand, CardModel):
     def add_card(self, card):
         super().add_card(card)
         self.new_cards.emit()  # something changed, better emit the signal!
+
+class HandModel_Table(Table, CardModel):
+    def __init__(self):
+        Table.__init__(self)
+        CardModel.__init__(self)
+        # Additional state needed by the UI
+        self.flipped_cards = False
+
+    def __iter__(self):
+        return iter(self.cards)
 
 ###################
 # Card widget code:
@@ -202,7 +218,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super(MainWindow, self).__init__()
-        self.setGeometry(50,50,1000,500)
+        self.MainWindow = QPixmap('cards/table.png')
         self.setWindowTitle('Poopy Poker')
 
         #Lower row
@@ -214,7 +230,10 @@ class MainWindow(QMainWindow):
 
         #Middle row
         h_layout2 = QHBoxLayout()
-        h_layout2.addWidget(self.CardWidget())
+        h_layout2.addStretch(1)
+        h_layout2.addWidget(self.TableWidget())
+        h_layout2.addStretch(1)
+
 
 
         #Upper row
@@ -228,7 +247,9 @@ class MainWindow(QMainWindow):
         #Add all layouts vertically
         main_vertical = QVBoxLayout()
         main_vertical.addLayout(h_layout3)
+        main_vertical.addStretch(1)
         main_vertical.addLayout(h_layout2)
+        main_vertical.addStretch(1)
         main_vertical.addLayout(h_layout)
 
 
@@ -248,6 +269,18 @@ class MainWindow(QMainWindow):
 
         return player_view
 
+    def TableWidget(self):
+
+        hand = HandModel_Table()
+        card_view = CardView(hand)
+        box = QHBoxLayout()
+        box.addWidget(card_view)
+
+        player_view = QWidget()
+        player_view.setFixedSize(2550, 700)
+        player_view.setLayout(box)
+
+        return player_view
 
     def PlayerInterface(self):
 
@@ -329,7 +362,7 @@ app = QApplication(sys.argv)
 # player_view.show()
 
 window = MainWindow()
-window.show()
+window.showMaximized()
 
 
 app.exec_()
