@@ -342,7 +342,7 @@ class MainWindow(QMainWindow):
         #
         pot_label = QLabel('Pot')
         pot_label.setAlignment(Qt.AlignCenter)
-        amount_button = QLineEdit('100')
+        amount_button = QLineEdit('100000')
         amount_button.setReadOnly(True)
         screen = app.primaryScreen()
         amount_button.setFixedWidth(int(screen.size().width() * 0.05))
