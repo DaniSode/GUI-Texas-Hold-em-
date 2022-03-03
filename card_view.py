@@ -98,8 +98,8 @@ class TableScene(QGraphicsScene):
     """ A scene with a table cloth background """
     def __init__(self):
         super().__init__()
-        self.tile = QPixmap('cards/table.png')
-        self.setBackgroundBrush(QBrush(self.tile))
+        # self.tile = QPixmap('cards/table.png')
+        # self.setBackgroundBrush(QBrush(self.tile))
 
 
 class CardItem(QGraphicsSvgItem):
@@ -140,7 +140,6 @@ class CardView(QGraphicsView):
         """
         self.scene = TableScene()
         super().__init__(self.scene)
-
         self.card_spacing = card_spacing
         self.padding = padding
 
@@ -214,18 +213,28 @@ class CardView(QGraphicsView):
 
 class MainWindow(QMainWindow):
 
-
     def __init__(self):
         super(MainWindow, self).__init__()
-        self.MainWindow = QPixmap('cards/table.png')
         self.setWindowTitle('Poopy Poker')
+        self.setStyleSheet('background-image: url(cards/Table.png);')
 
-        #Lower row
+        #Lower left row
         h_layout = QHBoxLayout()
         h_layout.addWidget(self.CardWidget())
         h_layout.addLayout(self.PlayerInterface())
-        h_layout.addWidget(self.CardWidget())
+        h_layout.addStretch(1)
+
+        # Lower middle row
+        h_lay = QVBoxLayout()
+        h_lay.addLayout(self.PotInformation())
+        h_lay.addStretch(1)
+        h_lay.addLayout(self.PokerInteraction())
+        h_layout.addLayout(h_lay)
+
+        # Lower right row
+        h_layout.addStretch(1)
         h_layout.addLayout(self.PlayerInterface())
+        h_layout.addWidget(self.CardWidget())
 
         #Middle row
         h_layout2 = QHBoxLayout()
@@ -233,20 +242,16 @@ class MainWindow(QMainWindow):
         h_layout2.addWidget(self.TableWidget())
         h_layout2.addStretch(1)
 
-
-
         #Upper row
         h_layout3 = QHBoxLayout()
         h_layout3.addStretch(1)
         h_layout3.addLayout(self.GeneralInformation())
-        h_layout3.addLayout(self.PotInformation())
         h_layout3.addStretch(1)
-        h_layout3.addLayout(self.PokerInteraction())
+
 
         #Add all layouts vertically
         main_vertical = QVBoxLayout()
         main_vertical.addLayout(h_layout3)
-        main_vertical.addStretch(1)
         main_vertical.addLayout(h_layout2)
         main_vertical.addStretch(1)
         main_vertical.addLayout(h_layout)
@@ -264,6 +269,8 @@ class MainWindow(QMainWindow):
         box = QHBoxLayout()
         box.addWidget(card_view)
         player_view = QWidget()
+        screen = app.primaryScreen()
+        player_view.setFixedSize(int(screen.size().width()*0.246), int(screen.size().height()*0.3))
         player_view.setLayout(box)
 
         return player_view
@@ -276,7 +283,8 @@ class MainWindow(QMainWindow):
         box.addWidget(card_view)
 
         player_view = QWidget()
-        player_view.setFixedSize(2550, 700)
+        screen = app.primaryScreen()
+        player_view.setFixedSize(int(screen.size().width()*0.6), int(screen.size().height()*0.3))
         player_view.setLayout(box)
 
         return player_view
@@ -284,7 +292,23 @@ class MainWindow(QMainWindow):
     def PlayerInterface(self):
 
         player_layout = QVBoxLayout()
-        widgets = [QLabel('Player'), QLabel('money'), QLabel('bet'), QPushButton('Flip cards')]
+        player = QLineEdit('Player')
+        player.setReadOnly(True)
+        player.setAlignment(Qt.AlignCenter)
+        player.setStyleSheet("padding: 3px 0px;")
+
+        money = QLineEdit('Money: Input')
+        money.setReadOnly(True)
+        money.setAlignment(Qt.AlignCenter)
+        money.setStyleSheet("padding: 3px 0px;")
+
+        bet = QLineEdit('Bet: Input')
+        bet.setReadOnly(True)
+        bet.setAlignment(Qt.AlignCenter)
+        bet.setStyleSheet("padding: 3px 0px;")
+
+        player_layout.setSpacing(0)
+        widgets = [player, money, bet, QPushButton('Flip cards')]
         for widget in widgets:
             player_layout.addWidget(widget)
 
@@ -293,40 +317,41 @@ class MainWindow(QMainWindow):
 
     def PokerInteraction(self):
 
-        vertical_layout = QVBoxLayout()
+        horizontal_layout = QHBoxLayout()
         sld = QLineEdit()
         sld.setValidator(QIntValidator())
 
-        # sld = QSlider(Qt.Horizontal, self)
-        # sld.setRange(0, 100)
-        # sld.label = QLabel('0', sld)
-        # sld.valueChanged.connect(sld.label.setText(str(sld)))
-
-
         buttons = [QPushButton('Check/Call'),
+                   QPushButton('Fold'),
                    QPushButton('Raise/Bet'),
-                   sld,
-                   QPushButton('Fold')]
+                   sld]
 
         for button in buttons:
-            vertical_layout.addWidget(button)
+            horizontal_layout.addWidget(button)
 
-        return vertical_layout
+        return horizontal_layout
 
 
     def PotInformation(self):
+
         vertical_layout = QVBoxLayout()
         #infos = [QLabel('pot'), QPushButton('100')]
         #
         # for info in infos:
         #     vertical_layout.addWidget(info)
         #
-        pot_label = QLabel('pot')
+        pot_label = QLabel('Pot')
         pot_label.setAlignment(Qt.AlignCenter)
-        amount_button = QPushButton('100')
+        amount_button = QLineEdit('100')
+        amount_button.setReadOnly(True)
+        screen = app.primaryScreen()
+        amount_button.setFixedWidth(int(screen.size().width() * 0.05))
+        amount_button.setAlignment(Qt.AlignCenter)
+        amount_button.setStyleSheet("padding: 3px 0px;")
 
         vertical_layout.addWidget(pot_label)
         vertical_layout.addWidget(amount_button)
+        vertical_layout.setAlignment(Qt.AlignCenter)
 
         return vertical_layout
 
@@ -335,15 +360,21 @@ class MainWindow(QMainWindow):
         vertical_layout = QVBoxLayout()
         text = QLabel('Vad de ska stå')
         text.setFrameStyle(QFrame.Panel | QFrame.Raised)
+        text.setAlignment(Qt.AlignCenter)
+        screen = app.primaryScreen()
+        text.setFixedSize(int(screen.size().width() * 0.246), int(screen.size().height() * 0.3))
         vertical_layout.addWidget(text)
 
         return vertical_layout
+
+
 ###################
 # Main test program
 ###################
 
 # Lets test it out
 app = QApplication(sys.argv)
+
 # hand = HandModel()
 # hand2 = HandModel()
 #
@@ -362,6 +393,7 @@ app = QApplication(sys.argv)
 
 window = MainWindow()
 window.showMaximized()
+
 
 
 app.exec_()
