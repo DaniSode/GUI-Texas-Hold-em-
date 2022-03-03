@@ -216,10 +216,13 @@ class MainWindow(QMainWindow):
         h_layout2 = QHBoxLayout()
         h_layout2.addWidget(self.CardWidget())
 
+
         #Upper row
         h_layout3 = QHBoxLayout()
+        h_layout3.addStretch(1)
         h_layout3.addLayout(self.GeneralInformation())
-
+        h_layout3.addLayout(self.PotInformation())
+        h_layout3.addStretch(1)
         h_layout3.addLayout(self.PokerInteraction())
 
         #Add all layouts vertically
@@ -235,45 +238,51 @@ class MainWindow(QMainWindow):
 
 
     def CardWidget(self):
+
         hand = HandModel()
         card_view = CardView(hand)
         box = QHBoxLayout()
         box.addWidget(card_view)
         player_view = QWidget()
         player_view.setLayout(box)
+
         return player_view
 
 
     def PlayerInterface(self):
 
         player_layout = QVBoxLayout()
-
-        widgets = [QLabel('Player'), QLabel('money'), QLabel('bet'), QPushButton('Flip cards') ]
-
-
+        widgets = [QLabel('Player'), QLabel('money'), QLabel('bet'), QPushButton('Flip cards')]
         for widget in widgets:
-
             player_layout.addWidget(widget)
-
 
         return player_layout
 
 
     def PokerInteraction(self):
-        vertical_layout = QVBoxLayout()
 
-        buttons = [QPushButton('Check'),
-                   QPushButton('Bet'),
-                   QPushButton('Call'),
-                   QPushButton('Raise'),
+        vertical_layout = QVBoxLayout()
+        sld = QLineEdit()
+        sld.setValidator(QIntValidator())
+
+        # sld = QSlider(Qt.Horizontal, self)
+        # sld.setRange(0, 100)
+        # sld.label = QLabel('0', sld)
+        # sld.valueChanged.connect(sld.label.setText(str(sld)))
+
+
+        buttons = [QPushButton('Check/Call'),
+                   QPushButton('Raise/Bet'),
+                   sld,
                    QPushButton('Fold')]
 
         for button in buttons:
             vertical_layout.addWidget(button)
+
         return vertical_layout
 
 
-    def GeneralInformation(self):
+    def PotInformation(self):
         vertical_layout = QVBoxLayout()
         #infos = [QLabel('pot'), QPushButton('100')]
         #
@@ -289,6 +298,14 @@ class MainWindow(QMainWindow):
 
         return vertical_layout
 
+    def GeneralInformation(self):
+
+        vertical_layout = QVBoxLayout()
+        text = QLabel('Vad de ska stå')
+        text.setFrameStyle(QFrame.Panel | QFrame.Raised)
+        vertical_layout.addWidget(text)
+
+        return vertical_layout
 ###################
 # Main test program
 ###################
