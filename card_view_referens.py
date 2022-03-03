@@ -320,6 +320,9 @@ class MainWindow(QMainWindow):
         horizontal_layout = QHBoxLayout()
         sld = QLineEdit()
         sld.setValidator(QIntValidator())
+        screen = app.primaryScreen()
+        sld.setFixedWidth(int(screen.size().width() * 0.05))
+        sld.setAlignment(Qt.AlignCenter)
         sld.setStyleSheet("padding: 2px 0px;")
         buttons = [QPushButton('Check/Call'),
                    QPushButton('Fold'),
