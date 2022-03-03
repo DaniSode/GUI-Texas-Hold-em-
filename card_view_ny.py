@@ -4,7 +4,6 @@ from PyQt5.QtSvg import *
 from PyQt5.QtWidgets import *
 from abc import abstractmethod
 import sys
-from cardlib import *
 
 # NOTE: This is just given as an example of how to use CardView.
 # It is expected that you will need to adjust things to make a game out of it. 
@@ -12,7 +11,6 @@ from cardlib import *
 ###################
 # Models
 ###################
-
 
 class CardModel(QObject):
     """ Base class that described what is expected from the CardView widget """
@@ -41,7 +39,7 @@ class MySimpleCard:
 class Hand:
     def __init__(self):
         # Lets use some hardcoded values for most of this to start with
-        self.cards = [MySimpleCard(14, 2), MySimpleCard(7, 0)]
+        self.cards = [MySimpleCard(13, 2), MySimpleCard(7, 0), MySimpleCard(13, 1)]
 
     def add_card(self, card):
         self.cards.append(card)
@@ -194,144 +192,21 @@ class CardView(QGraphicsView):
     #    self.model.flip() # Another possible event. Lets add it to the flip functionality for fun!
 
 
-
-
-
-class MainWindow(QMainWindow):
-
-
-    def __init__(self):
-        super(MainWindow, self).__init__()
-        self.setGeometry(50,50,1000,500)
-        self.setWindowTitle('Poker')
-
-        #Lower row
-        h_layout = QHBoxLayout()
-        h_layout.addWidget(self.CardWidget())
-        h_layout.addLayout(self.PlayerInterface())
-        h_layout.addWidget(self.CardWidget())
-        h_layout.addLayout(self.PlayerInterface())
-
-        #Middle row
-        h_layout2 = QHBoxLayout()
-        h_layout2.addWidget(self.CardWidget())
-
-
-        #Upper row
-        h_layout3 = QHBoxLayout()
-        h_layout3.addLayout(self.GeneralInformation())
-        #h_layout3.addStretch(1)
-        h_layout3.addLayout(self.PotInformation())
-        #h_layout3.alignment(AlignCenter)
-        h_layout3.addLayout(self.PokerInteraction())
-
-        #Add all layouts vertically
-        main_vertical = QVBoxLayout()
-        main_vertical.addLayout(h_layout3)
-        main_vertical.addLayout(h_layout2)
-        main_vertical.addLayout(h_layout)
-
-
-        widget = QWidget()
-        widget.setLayout(main_vertical)
-        self.setCentralWidget(widget)
-
-
-    def CardWidget(self):
-
-        hand = HandModel()
-        card_view = CardView(hand)
-        box = QHBoxLayout()
-        box.addWidget(card_view)
-        player_view = QWidget()
-        player_view.setLayout(box)
-
-        return player_view
-
-
-    def PlayerInterface(self):
-
-        player_layout = QVBoxLayout()
-        widgets = [QLabel('Player'), QLabel('money'), QLabel('bet'), QPushButton('Flip cards')]
-        for widget in widgets:
-            player_layout.addWidget(widget)
-
-        return player_layout
-
-
-    def PokerInteraction(self):
-
-        vertical_layout = QVBoxLayout()
-        sld = QLineEdit()
-        sld.setValidator(QIntValidator())
-
-        # sld = QSlider(Qt.Horizontal, self)
-        # sld.setRange(0, 100)
-        # sld.label = QLabel('0', sld)
-        # sld.valueChanged.connect(sld.label.setText(str(sld)))
-
-
-        buttons = [QPushButton('Check/Call'),
-                   QPushButton('Raise/Bet'),
-                   sld,
-                   QPushButton('Fold')]
-
-        for button in buttons:
-            vertical_layout.addWidget(button)
-
-        return vertical_layout
-
-
-    def PotInformation(self):
-        vertical_layout = QVBoxLayout()
-        #infos = [QLabel('pot'), QPushButton('100')]
-        #
-        # for info in infos:
-        #     vertical_layout.addWidget(info)
-        #
-        pot_label = QLabel('pot')
-        pot_label.setAlignment(Qt.AlignCenter)
-        amount_label = QLineEdit()
-        amount_label.setReadOnly(True)
-
-        vertical_layout.addWidget(pot_label)
-        vertical_layout.addWidget(amount_label)
-
-        return vertical_layout
-
-    def GeneralInformation(self):
-
-        vertical_layout = QVBoxLayout()
-        text = QLabel('This is a session of poker its very fun')
-        text.setFrameStyle(QFrame.Panel | QFrame.Raised)
-        vertical_layout.addWidget(text)
-
-        return vertical_layout
 ###################
 # Main test program
 ###################
 
 # Lets test it out
 app = QApplication(sys.argv)
-# hand = HandModel()
-# hand2 = HandModel()
-#
-# card_view = CardView(hand)
-# card_view2 = CardView(hand2)
+hand = HandModel()
+
+card_view = CardView(hand)
 
 # Creating a small demo window to work with, and put the card_view inside:
-
-
-# box = QHBoxLayout()
-# box.addWidget(card_view)
-# box.addWidget(card_view2)
-# player_view = QWidget()
-# player_view.setLayout(box)
-# player_view.show()
-
-window = MainWindow()
-window.show()
-
+box = QVBoxLayout()
+box.addWidget(card_view)
+player_view = QGroupBox("Player 1")
+player_view.setLayout(box)
+player_view.show()
 
 app.exec_()
-
