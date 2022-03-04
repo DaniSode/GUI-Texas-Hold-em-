@@ -1,9 +1,9 @@
 #
-
+from pokermodel import *
 from card_view_ny import *
 import sys
 
-
-window = SetupWindow()
+game = GameModel()
+window = SetupWindow(game)
 window.show()
 app.exec_()

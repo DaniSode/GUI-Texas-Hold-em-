@@ -4,7 +4,7 @@ from PyQt5.QtSvg import *
 from PyQt5.QtWidgets import *
 from abc import abstractmethod
 import sys
-# from pokermodel import *
+from pokermodel import *
 
 # NOTE: This is just given as an example of how to use CardView.
 # It is expected that you will need to adjust things to make a game out of it. 
@@ -225,9 +225,11 @@ class PlayerInformation(QVBoxLayout):
         super().__init__()
         self.player_name = player_name
         self.setSpacing(0)
-        widgets = [DisplayBox(f'{self.player_name}'), DisplayBox('Money: Input'), DisplayBox('Bet: Input'), QPushButton('Flip cards')]
+        flip_button = QPushButton('Flip cards')
+        widgets = [DisplayBox(f'{self.player_name}'), DisplayBox('Money: Input'), DisplayBox('Bet: Input'), flip_button]
         for widget in widgets:
             self.addWidget(widget)
+        flip_button.clicked.connect(HandModel.flipped)
 
 
 class PlayerCard(QWidget):
@@ -250,17 +252,7 @@ class PlayerView(QHBoxLayout):
         self.addLayout(PlayerInformation(player_name))
 
 
-# class Player2View(QHBoxLayout):
-#     def __init__(self, player_name):
-#         super().__init__()
-#         self.player_name = player_name
-#         self.addLayout(PlayerInformation(player_name))
-#         self.addWidget(PlayerCard())
-
-
 #Måste definiera input pot
-
-
 class PotInformation(QVBoxLayout):
     def __init__(self):
         super().__init__()
@@ -346,6 +338,7 @@ class SetupWindow(QMainWindow):
         layout = SetupView()
         self.button = QPushButton("Confirm")
         self.button.clicked.connect(self.proceed_to_main)
+        #self.button.clicked.connect(GameModel.start_game(hej))
         layout.addWidget(self.button, alignment=Qt.AlignCenter)
         screen = app.primaryScreen()
         self.button.setFixedWidth(int(screen.size().width() * 0.05))
@@ -359,8 +352,9 @@ class SetupWindow(QMainWindow):
         self.w.show()
         self.close()
 
-    #def update_player_info(self):
-
+    # def update_player_info(self):
+    #
+    #     self.GameModel.PlayerStates[0].name = EditBox.text()
 
 
 class MainGameWindow(QMainWindow):
@@ -368,6 +362,7 @@ class MainGameWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle("Texas Hold'em")
         self.setStyleSheet('background-image: url(cards/table.png);')
+        self.move(100, 50)
 
         # Lower row
         h_layout = QHBoxLayout()
