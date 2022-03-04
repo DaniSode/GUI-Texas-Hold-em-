@@ -4,6 +4,7 @@ from PyQt5.QtSvg import *
 from PyQt5.QtWidgets import *
 from abc import abstractmethod
 import sys
+# from pokermodel import *
 
 # NOTE: This is just given as an example of how to use CardView.
 # It is expected that you will need to adjust things to make a game out of it. 
@@ -208,6 +209,16 @@ class DisplayBox(QLineEdit):
         self.setFixedWidth(int(screen.size().width() * 0.05))
 
 
+class EditBox(QLineEdit):
+    def __init__(self, label):
+        super().__init__()
+        self.label = label
+        self.setText(f'{self.label}')
+        self.setStyleSheet("padding: 3px 0px;")
+        screen = app.primaryScreen()
+        self.setFixedWidth(int(screen.size().width() * 0.05))
+
+
 #Ändra inputs
 class PlayerInformation(QVBoxLayout):
     def __init__(self, player_name):
@@ -299,6 +310,57 @@ class InformationView(QVBoxLayout):
         text.setFixedSize(int(screen.size().width() * 0.1), int(screen.size().height() * 0.1))
         self.setAlignment(Qt.AlignCenter)
         self.addWidget(text)
+
+
+class PlayerSetup(QVBoxLayout):
+
+    def __init__(self, player_name):
+        super().__init__()
+        self.player_name = player_name
+        player = QLabel(player_name)
+        player.setAlignment(Qt.AlignCenter)
+        name_button = EditBox('')
+        self.addWidget(player)
+        self.addWidget(name_button)
+        self.setAlignment(Qt.AlignCenter)
+
+
+class SetupView(QVBoxLayout):
+    def __init__(self):
+        super().__init__()
+        self.addLayout(PlayerSetup('Name Player 1:'))
+        self.addStretch(1)
+        self.addLayout(PlayerSetup('Name Player 2:'))
+        self.addStretch(1)
+        self.addLayout(PlayerSetup('Stake:'))
+        self.addStretch(1)
+
+
+class SetupWindow(QMainWindow):
+
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Setup: Texas Hold'em")
+        self.setStyleSheet('background-image: url(cards/table.png);')
+
+        layout = SetupView()
+        self.button = QPushButton("Confirm")
+        self.button.clicked.connect(self.proceed_to_main)
+        layout.addWidget(self.button, alignment=Qt.AlignCenter)
+        screen = app.primaryScreen()
+        self.button.setFixedWidth(int(screen.size().width() * 0.05))
+
+        test_widget = QWidget()
+        test_widget.setLayout(layout)
+        self.setCentralWidget(test_widget)
+
+    def proceed_to_main(self):
+        self.w = MainGameWindow()
+        self.w.show()
+        self.close()
+
+    #def update_player_info(self):
+
 
 
 class MainGameWindow(QMainWindow):
