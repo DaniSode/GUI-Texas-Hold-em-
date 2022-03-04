@@ -197,7 +197,10 @@ class CardView(QGraphicsView):
 ###################
 # Main test program
 ###################
+
+
 class DisplayBox(QLineEdit):
+
     def __init__(self, label):
         super().__init__()
         self.label = label
@@ -210,6 +213,7 @@ class DisplayBox(QLineEdit):
 
 
 class EditBox(QLineEdit):
+
     def __init__(self):
         super().__init__()
         #self.label = label
@@ -219,7 +223,6 @@ class EditBox(QLineEdit):
         self.setFixedWidth(int(screen.size().width() * 0.05))
 
 
-# Ändra inputs
 class PlayerView(QHBoxLayout):
     def __init__(self, player_state):
         super().__init__()
@@ -229,41 +232,50 @@ class PlayerView(QHBoxLayout):
         card_view = CardView(hand)
         box = QHBoxLayout()
         box.addWidget(card_view)
-        PlayerCard = QWidget()
+        player_card = QWidget()
         screen = app.primaryScreen()
-        PlayerCard.setFixedSize(int(screen.size().width() * 0.246), int(screen.size().height() * 0.3))
-        PlayerCard.setLayout(box)
+        player_card.setFixedSize(int(screen.size().width() * 0.246), int(screen.size().height() * 0.3))
+        player_card.setLayout(box)
 
-        PlayerInformation = QVBoxLayout()
-        PlayerInformation.setSpacing(0)
-        flip_button = QPushButton('Flip cards')
-        widgets = [DisplayBox(f'{self.player_state.name}'), DisplayBox(f'Money: {self.player_state.money}'),
-                   DisplayBox(f'Bet: {self.player_state.bet}'), flip_button]
-        for widget in widgets:
-            PlayerInformation.addWidget(widget)
-        flip_button.clicked.connect(lambda x, checked=True: hand.flip())
+        player_information = QVBoxLayout()
+        player_information.setSpacing(0)
 
-        self.addWidget(PlayerCard)
-        self.addLayout(PlayerInformation)
+        self.player_name = DisplayBox(f'{self.player_state.name}')
+        self.money_box = DisplayBox(f'Money: {self.player_state.money}')
+        self.bet_box = DisplayBox(f'Bet: {self.player_state.bet}')
+        self.flip_button = QPushButton('Flip cards')
+        self.flip_button.clicked.connect(lambda x, checked=True: hand.flip())
+
+        player_information.addWidget(self.player_name)
+        player_information.addWidget(self.money_box)
+        player_information.addWidget(self.bet_box)
+        player_information.addWidget(self.flip_button)
+
+        self.addWidget(player_card)
+        self.addLayout(player_information)
+
+        self.player_state.data_changed.connect(self.update_views)
 
     def update_views(self):
 
+        self.money_box.setText(f'Money: {self.player_state.money}')
+        self.bet_box.setText(f'Bet: {self.player_state.bet}')
 
 
-#Måste definiera input pot
 class PotInformation(QVBoxLayout):
-    def __init__(self):
+
+    def __init__(self, game):
         super().__init__()
         pot_label = QLabel('Pot')
         pot_label.setAlignment(Qt.AlignCenter)
-        amount_button = DisplayBox('1000')
+        self.amount_box = DisplayBox('')
         self.addWidget(pot_label)
         self.addWidget(amount_button)
         self.setAlignment(Qt.AlignCenter)
 
 
-#Måste ändra input
 class TableView(QWidget):
+
     def __init__(self):
         super().__init__()
         hand = HandModel()
@@ -275,8 +287,8 @@ class TableView(QWidget):
         self.setLayout(box)
 
 
-#Måste fixa bet input
 class ActionsView(QHBoxLayout):
+
     def __init__(self, GameModel):
         super().__init__()
         self.GameModel = GameModel
@@ -315,7 +327,7 @@ class InformationView(QVBoxLayout):
         self.addWidget(text)
 
 
-class label_and_box(QVBoxLayout):
+class LabelAndBox(QVBoxLayout):
 
     def __init__(self, label):
         super().__init__()
@@ -331,21 +343,23 @@ class label_and_box(QVBoxLayout):
 class SetupView(QVBoxLayout):
     def __init__(self):
         super().__init__()
-        self.lblbox_1 = label_and_box('Name Player 1:')
-        self.lblbox_2 = label_and_box('Name Player 2:')
-        self.lblbox_3 = label_and_box('Stake:')
-        self.lblbox_3.enter_info.setValidator(QIntValidator(0, 1000000))
+        self.lbl_box_1 = LabelAndBox('Name Player 1:')
+        self.lbl_box_2 = LabelAndBox('Name Player 2:')
+        self.lbl_box_3 = LabelAndBox('Stake:')
+        self.lbl_box_3.enter_info.setValidator(QIntValidator(0, 1000000))
 
-        self.addLayout(self.lblbox_1)
+
+        self.addLayout(self.lbl_box_1)
         self.addStretch(1)
-        self.addLayout(self.lblbox_2)
+        self.addLayout(self.lbl_box_2)
         self.addStretch(1)
-        self.addLayout(self.lblbox_3)
+        self.addLayout(self.lbl_box_3)
         self.addStretch(1)
 
     def get_text(self):
 
-        return self.lblbox_1.enter_info.text(), self.lblbox_2.enter_info.text(), self.lblbox_3.enter_info.text()
+        return self.lbl_box_1.enter_info.text(), self.lbl_box_2.enter_info.text(), self.lbl_box_3.enter_info.text()
+
 
 class SetupWindow(QMainWindow):
 
@@ -382,6 +396,9 @@ class SetupWindow(QMainWindow):
 class MainGameWindow(QMainWindow):
     def __init__(self, game):
         super().__init__()
+    #     self.init_ui()
+    #
+    # def init_ui(self, game):
         self.setWindowTitle("Texas Hold'em")
         self.setStyleSheet('background-image: url(cards/table.png);')
         self.move(100, 50)
@@ -429,20 +446,3 @@ class MainGameWindow(QMainWindow):
         widget = QWidget()
         widget.setLayout(main_vertical)
         self.setCentralWidget(widget)
-
-        class MoneyModel(QObject):
-            new_value = pyqtSignal()
-
-            def __init__(self):
-                super().__init__()
-                self.balance = 100
-                self.bet = 0
-
-            def raise_bet(self, player_bet):  # emits and updates pot, balance and bet values.
-                self.bet = player_bet
-                self.balance -= self.bet
-                self.new_value.emit()
-
-            def clear(self):  # Clears pot and bet (used before next round)
-                self.bet = 0
-                self.new_value.emit()
