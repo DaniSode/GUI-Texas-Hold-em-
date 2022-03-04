@@ -276,14 +276,26 @@ class TableView(QWidget):
 class ActionsView(QHBoxLayout):
     def __init__(self):
         super().__init__()
-        actions = DisplayBox('')
-        actions.setReadOnly(False)
-        buttons = [QPushButton('Check/Call'),
-                   QPushButton('Fold'),
-                   QPushButton('Raise/Bet'),
-                   actions]
-        for button in buttons:
-            self.addWidget(button)
+        self.GameModel = GameModel
+        self.raise_amount = EditBox()
+        self.check_call_button = QPushButton('Check/Call')
+
+        self.fold_button = QPushButton('Fold')
+
+        self.raise_bet_button = QPushButton('Raise/Bet')
+        self.raise_bet_button.clicked.connect(self.make_bet)
+
+        self.addWidget(self.check_call_button)
+        self.addWidget(self.fold_button)
+        self.addWidget(self.raise_bet_button)
+        self.addWidget(self.raise_amount)
+
+    def get_raise_amount(self):
+
+        return self.raise_amount.text()
+
+    def make_bet(self):
+        self.GameModel.bet(self.get_raise_amount())
 
 
 class InformationView(QVBoxLayout):
@@ -320,7 +332,6 @@ class SetupView(QVBoxLayout):
         self.lblbox_3 = label_and_box('Stake:')
         self.lblbox_3.enter_info.setValidator(QIntValidator(0, 1000000))
 
-
         self.addLayout(self.lblbox_1)
         self.addStretch(1)
         self.addLayout(self.lblbox_2)
@@ -329,6 +340,7 @@ class SetupView(QVBoxLayout):
         self.addStretch(1)
 
     def get_text(self):
+
         return self.lblbox_1.enter_info.text(), self.lblbox_2.enter_info.text(), self.lblbox_3.enter_info.text()
 
 class SetupWindow(QMainWindow):

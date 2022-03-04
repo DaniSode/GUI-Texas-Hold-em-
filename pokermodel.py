@@ -43,8 +43,12 @@ class GameModel(QObject):
     def fold(self):
         pass
 
-    def bet(self):
-        pass
+    def bet(self, amount):
+
+        for player in self.PlayerStates:
+            if player.active:
+
+                print(amount)
 
     def call(self):
         pass
