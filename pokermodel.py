@@ -7,7 +7,7 @@ class PlayerState(QObject):
     def __init__(self, name, money):
         super().__init__()
         self.name = name
-        self.money = money
+        self.money = int(money)
         self.bet = 0
         self.wins = 0
         self.active = False
@@ -21,19 +21,17 @@ class PlayerState(QObject):
         self.data_changed.emit()
 
 
-# class PotState(QObject):
-#     def __init__(self):
-
 class MoneyModel:
     pass
 
 
-
 class GameModel(QObject):
     data_changed = pyqtSignal()
+
     def __init__(self):
         super().__init__()
         self.PlayerStates = []
+        self.pot = 0
 
     def start_game(self, player_infos):
         self.PlayerStates.append(PlayerState(player_infos[0], player_infos[2]))
@@ -48,7 +46,6 @@ class GameModel(QObject):
             else:
                 player.set_active(True)
 
-
     def fold(self):
         pass
 
@@ -56,16 +53,12 @@ class GameModel(QObject):
 
         for player in self.PlayerStates:
             if player.active:
-                #Eget bet öka
-                #Pot öka
-                #Money minska
-                print(player.name)
-                print(amount)
+                self.pot += int(amount)
+                player.bet += int(amount)
+                player.money -= int(amount)
 
         self.next_player()
         self.data_changed.emit()
 
-
     def call(self):
         pass
-
