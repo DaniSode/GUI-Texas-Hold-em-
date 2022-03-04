@@ -4,9 +4,10 @@ from PyQt5.QtCore import (pyqtSignal, QObject)
 class PlayerState(QObject):
     data_changed = pyqtSignal()
 
-    def __init__(self, name):
+    def __init__(self, name, money):
         super().__init__()
         self.name = name
+        self.money = money
         self.wins = 0
         self.active = False
 
@@ -22,15 +23,22 @@ class PlayerState(QObject):
 # class PotState(QObject):
 #     def __init__(self):
 
+class MoneyModel:
+    pass
+
+
 
 class GameModel(QObject):
-
+    data_changed = pyqtSignal()
     def __init__(self):
         super().__init__()
         self.PlayerStates = []
 
-    def start_game(self, players):
-        self.PlayerStates.append(PlayerState(players))
+    def start_game(self, player_infos):
+        self.PlayerStates.append(PlayerState(player_infos[0], player_infos[2]))
+        self.PlayerStates.append(PlayerState(player_infos[1], player_infos[2]))
+        self.data_changed.emit()
+
 
     def fold(self):
         pass
@@ -40,3 +48,4 @@ class GameModel(QObject):
 
     def call(self):
         pass
+

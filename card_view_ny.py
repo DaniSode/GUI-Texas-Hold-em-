@@ -210,10 +210,10 @@ class DisplayBox(QLineEdit):
 
 
 class EditBox(QLineEdit):
-    def __init__(self, label):
+    def __init__(self):
         super().__init__()
-        self.label = label
-        self.setText(f'{self.label}')
+        #self.label = label
+        #self.setText(f'{self.label}')
         self.setStyleSheet("padding: 3px 0px;")
         screen = app.primaryScreen()
         self.setFixedWidth(int(screen.size().width() * 0.05))
@@ -299,63 +299,70 @@ class InformationView(QVBoxLayout):
         self.addWidget(text)
 
 
-class PlayerSetup(QVBoxLayout):
+class label_and_box(QVBoxLayout):
 
-    def __init__(self, player_name):
+    def __init__(self, label):
         super().__init__()
-        self.player_name = player_name
-        player = QLabel(player_name)
-        player.setAlignment(Qt.AlignCenter)
-        name_button = EditBox('')
-        self.addWidget(player)
-        self.addWidget(name_button)
+        self.player_name = label
+        lbl = QLabel(label)
+        lbl.setAlignment(Qt.AlignCenter)
+        self.enter_info = EditBox()
+        self.addWidget(lbl)
+        self.addWidget(self.enter_info)
         self.setAlignment(Qt.AlignCenter)
 
 
 class SetupView(QVBoxLayout):
     def __init__(self):
         super().__init__()
-        self.addLayout(PlayerSetup('Name Player 1:'))
+        self.lblbox_1 = label_and_box('Name Player 1:')
+        self.lblbox_2 = label_and_box('Name Player 2:')
+        self.lblbox_3 = label_and_box('Stake:')
+
+        self.addLayout(self.lblbox_1)
         self.addStretch(1)
-        self.addLayout(PlayerSetup('Name Player 2:'))
+        self.addLayout(self.lblbox_2)
         self.addStretch(1)
-        self.addLayout(PlayerSetup('Stake:'))
+        self.addLayout(self.lblbox_3)
         self.addStretch(1)
 
+    def get_text(self):
+        return self.lblbox_1.enter_info.text(), self.lblbox_2.enter_info.text(), self.lblbox_3.enter_info.text()
 
 class SetupWindow(QMainWindow):
 
     def __init__(self, GameModel):
         super().__init__()
-        hej = 'pung'
+        self.GameModel = GameModel
         self.setWindowTitle("Setup: Texas Hold'em")
         self.setStyleSheet('background-image: url(cards/table.png);')
 
-        layout = SetupView()
+        self.layout = SetupView()
         self.button = QPushButton("Confirm")
         self.button.setDefault(True)
         self.button.clicked.connect(self.proceed_to_main)
-        #self.button.clicked.connect(GameModel.start_game(hej))
-        layout.addWidget(self.button, alignment=Qt.AlignCenter)
+        self.layout.addWidget(self.button, alignment=Qt.AlignCenter)
         screen = app.primaryScreen()
         self.button.setFixedWidth(int(screen.size().width() * 0.05))
 
         test_widget = QWidget()
-        test_widget.setLayout(layout)
+        test_widget.setLayout(self.layout)
         self.setCentralWidget(test_widget)
 
     def proceed_to_main(self):
-        self.w = MainGameWindow()
+        self.GameModel.start_game(self.layout.get_text())
+        self.w = MainGameWindow(self.GameModel)
         self.w.show()
         self.close()
 
-    # def update_player_info(self):
+    # def set_player_info(self):
     #
-    #     self.GameModel.PlayerStates[0].name = EditBox.text()
+    #     self.GameModel.start_game(self.layout.PlayerSetup_1.enter_info.text())
+    #     self.button.clicked.connect(self.set_player_info())
 
 
 class MainGameWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, game):
         super().__init__()
         self.setWindowTitle("Texas Hold'em")
         self.setStyleSheet('background-image: url(cards/table.png);')
@@ -365,7 +372,7 @@ class MainGameWindow(QMainWindow):
         h_layout = QHBoxLayout()
 
         # Lower left row
-        h_layout.addLayout(PlayerView('Queen Daniel'))
+        h_layout.addLayout(PlayerView(game.PlayerStates[0]))
         h_layout.addStretch(1)
 
         # Lower middle row
@@ -379,7 +386,7 @@ class MainGameWindow(QMainWindow):
 
         # Lower right row
         h_layout.addStretch(1)
-        h_layout.addLayout(PlayerView('King Felix'))
+        h_layout.addLayout(PlayerView(game.PlayerStates[1]))
 
         # Middle row
         h_layout2 = QHBoxLayout()

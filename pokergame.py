@@ -6,4 +6,5 @@ import sys
 game = GameModel()
 window = SetupWindow(game)
 window.show()
+
 app.exec_()
