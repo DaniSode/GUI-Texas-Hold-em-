@@ -330,8 +330,9 @@ class SetupView(QVBoxLayout):
 
 class SetupWindow(QMainWindow):
 
-    def __init__(self):
+    def __init__(self, GameModel):
         super().__init__()
+        hej = 'pung'
         self.setWindowTitle("Setup: Texas Hold'em")
         self.setStyleSheet('background-image: url(cards/table.png);')
 

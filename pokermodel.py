@@ -19,13 +19,18 @@ class PlayerState(QObject):
         self.data_changed.emit()
 
 
-class PotState(QObject):
+# class PotState(QObject):
+#     def __init__(self):
+
+
+class GameModel(QObject):
+
     def __init__(self):
+        super().__init__()
+        self.PlayerStates = []
 
-
-class TexasHoldEm(QObject):
-
-    def __init__(self):
+    def start_game(self, players):
+        self.PlayerStates.append(PlayerState(players))
 
     def fold(self):
         pass
