@@ -246,6 +246,9 @@ class PlayerView(QHBoxLayout):
         self.addWidget(PlayerCard)
         self.addLayout(PlayerInformation)
 
+        def update_views(self):
+
+
 
 #Måste definiera input pot
 class PotInformation(QVBoxLayout):
