@@ -237,8 +237,8 @@ class PlayerView(QHBoxLayout):
         PlayerInformation = QVBoxLayout()
         PlayerInformation.setSpacing(0)
         flip_button = QPushButton('Flip cards')
-        widgets = [DisplayBox(f'{self.player_state.name}'), DisplayBox(f'Money: {self.player_state.money}'), DisplayBox('Bet: Input'),
-                   flip_button]
+        widgets = [DisplayBox(f'{self.player_state.name}'), DisplayBox(f'Money: {self.player_state.money}'),
+                   DisplayBox(f'Bet: {self.player_state.bet}'), flip_button]
         for widget in widgets:
             PlayerInformation.addWidget(widget)
         flip_button.clicked.connect(lambda x, checked=True: hand.flip())

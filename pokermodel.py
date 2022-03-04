@@ -8,6 +8,7 @@ class PlayerState(QObject):
         super().__init__()
         self.name = name
         self.money = money
+        self.bet = 0
         self.wins = 0
         self.active = False
 
@@ -47,8 +48,15 @@ class GameModel(QObject):
 
         for player in self.PlayerStates:
             if player.active:
-
+                #Eget bet öka
+                #Pot öka
+                #Money minska
+                print(player.name)
                 print(amount)
+
+        self.next_player()
+        self.data_changed.emit()
+
 
     def call(self):
         pass
