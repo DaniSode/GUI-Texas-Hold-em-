@@ -39,7 +39,15 @@ class GameModel(QObject):
         self.PlayerStates.append(PlayerState(player_infos[0], player_infos[2]))
         self.PlayerStates.append(PlayerState(player_infos[1], player_infos[2]))
         self.data_changed.emit()
-        self.PlayerStates[0]
+        self.PlayerStates[0].set_active(True)
+
+    def next_player(self):
+        for player in self.PlayerStates:
+            if player.active:
+                player.set_active(False)
+            else:
+                player.set_active(True)
+
 
     def fold(self):
         pass

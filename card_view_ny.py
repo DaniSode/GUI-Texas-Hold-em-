@@ -296,7 +296,7 @@ class ActionsView(QHBoxLayout):
 
     def make_bet(self):
         self.GameModel.bet(self.get_raise_amount())
-
+        self.raise_amount.setText('')
 
 class InformationView(QVBoxLayout):
     def __init__(self, text):
