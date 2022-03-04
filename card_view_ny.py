@@ -224,9 +224,11 @@ class EditBox(QLineEdit):
 
 
 class PlayerView(QHBoxLayout):
-    def __init__(self, player_state):
+
+    def __init__(self, player_state, game):
         super().__init__()
         self.player_state = player_state
+        self.game = game
 
         hand = HandModel()
         card_view = CardView(hand)
@@ -266,12 +268,20 @@ class PotInformation(QVBoxLayout):
 
     def __init__(self, game):
         super().__init__()
+        self.game = game
         pot_label = QLabel('Pot')
         pot_label.setAlignment(Qt.AlignCenter)
         self.amount_box = DisplayBox('')
         self.addWidget(pot_label)
-        self.addWidget(amount_button)
+        self.addWidget(self.amount_box)
         self.setAlignment(Qt.AlignCenter)
+
+        self.game.data_changed.connect(self.update_views)
+
+    def update_views(self):
+        self.amount_box.setText(f'{self.game.pot}')
+
+
 
 
 class TableView(QWidget):
@@ -407,12 +417,12 @@ class MainGameWindow(QMainWindow):
         h_layout = QHBoxLayout()
 
         # Lower left row
-        h_layout.addLayout(PlayerView(game.PlayerStates[0]))
+        h_layout.addLayout(PlayerView(game.PlayerStates[0],game))
         h_layout.addStretch(1)
 
         # Lower middle row
         h_lay = QVBoxLayout()
-        h_lay.addLayout(PotInformation())
+        h_lay.addLayout(PotInformation(game))
         h_lay.addStretch(1)
         h_lay.addLayout(InformationView("Player 1's turn"))
         h_lay.addStretch(1)
@@ -421,7 +431,7 @@ class MainGameWindow(QMainWindow):
 
         # Lower right row
         h_layout.addStretch(1)
-        h_layout.addLayout(PlayerView(game.PlayerStates[1]))
+        h_layout.addLayout(PlayerView(game.PlayerStates[1],game))
 
         # Middle row
         h_layout2 = QHBoxLayout()

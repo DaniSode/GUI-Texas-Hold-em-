@@ -56,6 +56,7 @@ class GameModel(QObject):
                 self.pot += int(amount)
                 player.bet += int(amount)
                 player.money -= int(amount)
+                player.data_changed.emit()
 
         self.next_player()
         self.data_changed.emit()
