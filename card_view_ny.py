@@ -219,37 +219,32 @@ class EditBox(QLineEdit):
         self.setFixedWidth(int(screen.size().width() * 0.05))
 
 
-#Ändra inputs
-class PlayerInformation(QVBoxLayout):
-    def __init__(self, player_name):
+# Ändra inputs
+class PlayerView(QHBoxLayout):
+    def __init__(self, player_state):
         super().__init__()
-        self.player_name = player_name
-        self.setSpacing(0)
-        flip_button = QPushButton('Flip cards')
-        widgets = [DisplayBox(f'{self.player_name}'), DisplayBox('Money: Input'), DisplayBox('Bet: Input'), flip_button]
-        for widget in widgets:
-            self.addWidget(widget)
-        flip_button.clicked.connect(HandModel.flipped)
+        self.player_state = player_state
 
-
-class PlayerCard(QWidget):
-    def __init__(self):
-        super().__init__()
         hand = HandModel()
         card_view = CardView(hand)
         box = QHBoxLayout()
         box.addWidget(card_view)
+        PlayerCard = QWidget()
         screen = app.primaryScreen()
-        self.setFixedSize(int(screen.size().width()*0.246), int(screen.size().height()*0.3))
-        self.setLayout(box)
+        PlayerCard.setFixedSize(int(screen.size().width() * 0.246), int(screen.size().height() * 0.3))
+        PlayerCard.setLayout(box)
 
+        PlayerInformation = QVBoxLayout()
+        PlayerInformation.setSpacing(0)
+        flip_button = QPushButton('Flip cards')
+        widgets = [DisplayBox(f'{self.player_state.name}'), DisplayBox(f'Money: {self.player_state.money}'), DisplayBox('Bet: Input'),
+                   flip_button]
+        for widget in widgets:
+            PlayerInformation.addWidget(widget)
+        flip_button.clicked.connect(lambda x, checked=True: hand.flip())
 
-class PlayerView(QHBoxLayout):
-    def __init__(self, player_name):
-        super().__init__()
-        self.player_name = player_name
-        self.addWidget(PlayerCard())
-        self.addLayout(PlayerInformation(player_name))
+        self.addWidget(PlayerCard)
+        self.addLayout(PlayerInformation)
 
 
 #Måste definiera input pot
@@ -338,6 +333,7 @@ class SetupWindow(QMainWindow):
 
         layout = SetupView()
         self.button = QPushButton("Confirm")
+        self.button.setDefault(True)
         self.button.clicked.connect(self.proceed_to_main)
         #self.button.clicked.connect(GameModel.start_game(hej))
         layout.addWidget(self.button, alignment=Qt.AlignCenter)
