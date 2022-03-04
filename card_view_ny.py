@@ -318,6 +318,8 @@ class SetupView(QVBoxLayout):
         self.lblbox_1 = label_and_box('Name Player 1:')
         self.lblbox_2 = label_and_box('Name Player 2:')
         self.lblbox_3 = label_and_box('Stake:')
+        self.lblbox_3.enter_info.setValidator(QIntValidator(0, 1000000))
+
 
         self.addLayout(self.lblbox_1)
         self.addStretch(1)
@@ -411,3 +413,20 @@ class MainGameWindow(QMainWindow):
         widget = QWidget()
         widget.setLayout(main_vertical)
         self.setCentralWidget(widget)
+
+        class MoneyModel(QObject):
+            new_value = pyqtSignal()
+
+            def __init__(self):
+                super().__init__()
+                self.balance = 100
+                self.bet = 0
+
+            def raise_bet(self, player_bet):  # emits and updates pot, balance and bet values.
+                self.bet = player_bet
+                self.balance -= self.bet
+                self.new_value.emit()
+
+            def clear(self):  # Clears pot and bet (used before next round)
+                self.bet = 0
+                self.new_value.emit()
