@@ -38,7 +38,7 @@ class GameModel(QObject):
         self.PlayerStates.append(PlayerState(player_infos[0], player_infos[2]))
         self.PlayerStates.append(PlayerState(player_infos[1], player_infos[2]))
         self.data_changed.emit()
-
+        self.PlayerStates[0]
 
     def fold(self):
         pass

@@ -274,7 +274,7 @@ class TableView(QWidget):
 
 #Måste fixa bet input
 class ActionsView(QHBoxLayout):
-    def __init__(self):
+    def __init__(self, GameModel):
         super().__init__()
         self.GameModel = GameModel
         self.raise_amount = EditBox()
@@ -395,7 +395,7 @@ class MainGameWindow(QMainWindow):
         h_lay.addStretch(1)
         h_lay.addLayout(InformationView("Player 1's turn"))
         h_lay.addStretch(1)
-        h_lay.addLayout(ActionsView())
+        h_lay.addLayout(ActionsView(game))
         h_layout.addLayout(h_lay)
 
         # Lower right row
