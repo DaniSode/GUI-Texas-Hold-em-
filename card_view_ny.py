@@ -9,52 +9,6 @@ from cardlib import *
 
 app = QApplication(sys.argv)
 
-# NOTE: This is just given as an example of how to use CardView.
-# It is expected that you will need to adjust things to make a game out of it.
-
-###################
-# Models
-###################
-
-
-class CardModel(QObject):
-    """ Base class that described what is expected from the CardView widget """
-
-    new_cards = pyqtSignal()  #: Signal should be emited when cards change.
-
-    @abstractmethod
-    def __iter__(self):
-        """Returns an iterator of card objects"""
-
-    @abstractmethod
-    def flipped(self):
-        """Returns true of cards should be drawn face down"""
-
-
-# A trivial card class (you should use the stuff you made in your library instead!
-class MySimpleCard:
-    def __init__(self, value, suit):
-        self.value = value
-        self.suit = suit
-
-    def get_value(self):
-        return self.value
-
-
-# You have made a class similar to this (hopefully):
-class Hand:
-    def __init__(self):
-        # Lets use some hardcoded values for most of this to start with
-
-        d = StandardDeck()
-        d.shuffle()
-        self.cards = [d.draw(), d.draw()]
-        # self.cards = [MySimpleCard(13, 2), MySimpleCard(7, 1), MySimpleCard(13, 1), MySimpleCard(13, 4), MySimpleCard(7, 3)]
-
-    def add_card(self, card):
-        self.cards.append(card)
-
-
 # We can extend this class to create a model, which updates the view whenever it has changed.
 # NOTE: You do NOT have to do it this way.
 # You might find it easier to make a Player-model, or a whole GameState-model instead.
@@ -302,6 +256,11 @@ class TableView(QWidget):
         self.setFixedSize(int(screen.size().width() * 0.6), int(screen.size().height() * 0.3))
         self.setLayout(box)
 
+        self.game.tablestate.data_changed.connect(self.update_views)
+
+    def update_views(self):
+        self.card_view.change_cards()
+
 
 class ActionsView(QHBoxLayout):
 
@@ -350,12 +309,23 @@ class HeaderView(QVBoxLayout):
         super().__init__()
         header = QLabel('Welcome to a beautiful game of poopy poker')
         header.setFrameStyle(QFrame.Panel | QFrame.Raised)
-        header.setFont(QFont('Chiller', 40))
+        header.setFont(QFont('Comic Sans MS', 40)) # Chiller - typsnitt
         header.setAlignment(Qt.AlignCenter)
         screen = app.primaryScreen()
         header.setFixedSize(int(screen.size().width() * 0.75), int(screen.size().height() * 0.1))
         self.setAlignment(Qt.AlignCenter)
         self.addWidget(header)
+
+
+class NextRound(QObject):
+    def __init__(self):
+        super().__init__()
+        self.button.clicked.connect(self.show_popup)
+
+    def show_popup(self):
+        msg = QMessageBox
+        msg.setText("Do you want to move on to the next round?")
+        x = msg.exec_()
 
 
 class InformationView(QVBoxLayout):

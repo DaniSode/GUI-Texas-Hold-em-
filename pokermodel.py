@@ -2,6 +2,7 @@ from PyQt5.QtCore import (pyqtSignal, QObject)
 from cardlib import *
 
 
+
 class PlayerState(QObject):
     data_changed = pyqtSignal()
 
@@ -65,6 +66,7 @@ class GameModel(QObject):
             player.hand.add_card((self.deck.draw()))
             player.hand.add_card((self.deck.draw()))
 
+
     def who_is_active(self):
         for player in self.PlayerStates:
             if player.active:
@@ -78,13 +80,10 @@ class GameModel(QObject):
             self.tablestate.tablecards.add_card(self.deck.draw())
             self.tablestate.tablecards.add_card(self.deck.draw())
             self.tablestate.tablecards.add_card(self.deck.draw())
-            print('3')
         elif len(self.tablestate.tablecards.cards) == 3:
             self.tablestate.tablecards.add_card(self.deck.draw())
-            print('4')
         elif len(self.tablestate.tablecards.cards) == 4:
             self.tablestate.tablecards.add_card(self.deck.draw())
-            print('5')
         else:
             self.evaluate_winner()
         for player in self.PlayerStates:
@@ -104,8 +103,19 @@ class GameModel(QObject):
 
     def all_in(self):
         players = self.who_is_active()
-        if players[0].money > players[1].money:
+        if players[0].money + players[0].bet > players[1].money + players[1].bet:
             print("You can't bet more than your opponent's money")
+        elif players[0].money == players[1].bet:
+            amount = players[0].money
+            self.pot += int(amount)
+            players[0].bet += int(amount)
+            players[0].money -= int(amount)
+            players[0].data_changed.emit()
+            print(f'{players[0].name} is all in!')
+            while len(self.tablestate.tablecards.cards) != 5:
+                self.new_card_event()
+            self.evaluate_winner()
+            self.data_changed.emit()
         else:
             amount = players[0].money
             self.pot += int(amount)
@@ -165,9 +175,28 @@ class GameModel(QObject):
         self.data_changed.emit()
 
     def evaluate_winner(self):
+        bph0 = self.PlayerStates[0].hand.best_poker_hand(self.tablestate.tablecards.cards)
+        bph1 = self.PlayerStates[1].hand.best_poker_hand(self.tablestate.tablecards.cards)
+        print(f'{self.PlayerStates[0].name} has {str(bph0)}')
+        print(f'{self.PlayerStates[1].name} has {str(bph1)}')
+        if bph0 > bph1:
+            self.PlayerStates[0].won(self.pot)
+            print(f'{self.PlayerStates[0].name} wins')
+        elif bph1 > bph0:
+            self.PlayerStates[1].won(self.pot)
+            print(f'{self.PlayerStates[1].name} wins')
+        else:
+            self.PlayerStates[0].won(self.pot/2)
+            self.PlayerStates[1].won(self.pot/2)
+            print('split pot')
+        self.data_changed.emit()
+        if self.PlayerStates[0].money == 0:
+            print(f'The Winner of The Game is {self.PlayerStates[1].name}')
 
-        print('Hej')
-        self.next_round()
+        elif self.PlayerStates[1].money == 0:
+            print(f'The Winner of The Game is {self.PlayerStates[0].name}')
+        else:
+            self.next_round()
         # Måste ha if bets are equal då vill vi trigga nytt card event
 
     def next_player(self):
@@ -190,12 +219,12 @@ class GameModel(QObject):
         self.deck.shuffle()
 
         self.tablestate.tablecards.clear_all_cards()
-
-
+        self.tablestate.data_changed.emit()
         for player in self.PlayerStates:
             player.reset_bet()
             player.hand.clear_all_cards()
             player.data_changed.emit()
+
         #Kolla vem som började senast
         for player in self.PlayerStates:
             if player.started:
