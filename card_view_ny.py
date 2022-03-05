@@ -297,7 +297,7 @@ class HeaderView(QVBoxLayout):
         self.addWidget(header)
 
 
-class NextRound(QObject):
+class EndGame(QObject):
     def __init__(self):
         super().__init__()
         self.button.clicked.connect(self.show_popup)

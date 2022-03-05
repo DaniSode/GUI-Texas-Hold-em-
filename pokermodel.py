@@ -17,6 +17,7 @@ class CardModel(QObject):
 
 
 class HandModel(Hand, CardModel):
+
     def __init__(self):
         Hand.__init__(self)
         CardModel.__init__(self)
@@ -89,6 +90,7 @@ class GameModel(QObject):
 
     def __init__(self):
         super().__init__()
+        self.endgame = False
         self.PlayerStates = []
         self.pot = 0
         self.deck = StandardDeck()
@@ -104,11 +106,9 @@ class GameModel(QObject):
         self.data_changed.emit()
         self.PlayerStates[0].set_active(True)
         self.PlayerStates[0].set_starter(True)
-        #self.tablestate.tablecards.add_card(self.deck.draw())
         for player in self.PlayerStates:
             player.hand.add_card((self.deck.draw()))
             player.hand.add_card((self.deck.draw()))
-
 
     def who_is_active(self):
         for player in self.PlayerStates:
@@ -237,16 +237,15 @@ class GameModel(QObject):
             self.pot = 0
             PlayerState[0].reset_bet()
             PlayerState[1].reset_bet()
-            # Exit application
+            self.end_of_game()
         elif self.PlayerStates[1].money == 0:
             print(f'The Winner of The Game is {self.PlayerStates[0].name}')
             self.pot = 0
             PlayerState[0].reset_bet()
             PlayerState[1].reset_bet()
-            # Exit application
+            self.end_of_game()
         else:
             self.next_round()
-        # Måste ha if bets are equal då vill vi trigga nytt card event
 
     def next_player(self):
         """
@@ -263,10 +262,8 @@ class GameModel(QObject):
         Resets the pot and player bets. Sets the new starting player as active.
         """
         self.pot = 0
-
         self.deck = StandardDeck()
         self.deck.shuffle()
-
         self.tablestate.tablecards.clear_all_cards()
         self.tablestate.data_changed.emit()
         for player in self.PlayerStates:
@@ -284,6 +281,8 @@ class GameModel(QObject):
             else:
                 player.set_starter(True)
                 player.set_active(True)
+        self.data_changed.emit()
 
-
+    def end_of_game(self):
+        self.endgame = True
         self.data_changed.emit()
