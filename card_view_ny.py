@@ -368,7 +368,7 @@ class InformationView(QVBoxLayout):
         self.game.data_changed.connect(self.update_view)
 
     def update_view(self):
-        #players = self.game.who_is_active()
+
         test = [player.name for player in self.game.PlayerStates if player.active]
         self.text.setText(f"{test[0]}'s turn")
 
@@ -393,7 +393,7 @@ class SetupView(QVBoxLayout):
         self.lbl_box_1 = LabelAndBox('Name Player 1:')
         self.lbl_box_2 = LabelAndBox('Name Player 2:')
         self.lbl_box_3 = LabelAndBox('Stake:')
-        self.lbl_box_3.enter_info.setValidator(QIntValidator(0, 1000000))
+        self.lbl_box_3.enter_info.setValidator(QIntValidator(0, 10000000000))
 
         self.addLayout(self.lbl_box_1)
         self.addStretch(1)
@@ -442,9 +442,7 @@ class SetupWindow(QMainWindow):
 class MainGameWindow(QMainWindow):
     def __init__(self, game):
         super().__init__()
-    #     self.init_ui()
-    #
-    # def init_ui(self, game):
+
         self.setWindowTitle("Texas Hold'em")
         self.setStyleSheet('background-image: url(cards/table.png);')
         self.move(100, 50)

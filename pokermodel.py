@@ -89,14 +89,16 @@ class GameModel(QObject):
 
     def bet(self, amount):
         players = self.who_is_active()
+        if int(amount) > players[0].money:
+            print("You don't have enough money!")
+        else:
+            self.pot += int(amount)
+            players[0].bet += int(amount)
+            players[0].money -= int(amount)
+            players[0].data_changed.emit()
+            self.next_player()
+            self.data_changed.emit()
 
-        self.pot += int(amount)
-        players[0].bet += int(amount)
-        players[0].money -= int(amount)
-        players[0].data_changed.emit()
-
-        self.next_player()
-        self.data_changed.emit()
 
     def call(self):
         players = self.who_is_active()
