@@ -43,7 +43,7 @@ class Hand:
     def __init__(self):
         # Lets use some hardcoded values for most of this to start with
         self.cards = [MySimpleCard(13, 2), MySimpleCard(7, 0), MySimpleCard(13, 1), MySimpleCard(13, 3), MySimpleCard(7, 3)]
-
+        print(self.cards)
     def add_card(self, card):
         self.cards.append(card)
 

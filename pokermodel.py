@@ -1,44 +1,6 @@
 from PyQt5.QtCore import (pyqtSignal, QObject)
 from cardlib import *
 
-class HandModel(Hand, CardModel):
-    def __init__(self):
-        Hand.__init__(self)
-        CardModel.__init__(self)
-        # Additional state needed by the UI
-        self.flipped_cards = False
-
-    def __iter__(self):
-        return iter(self.cards)
-
-    def flip(self):
-        # Flips over the cards (to hide them)
-        self.flipped_cards = not self.flipped_cards
-        self.new_cards.emit()  # something changed, better emit the signal!
-
-    def flipped(self):
-        # This model only flips all or no cards, so we don't care about the index.
-        # Might be different for other games though!
-        return self.flipped_cards
-
-    def add_card(self, card):
-        super().add_card(card)
-        self.new_cards.emit()  # something changed, better emit the signal!
-
-
-class CardModel(QObject):
-    """ Base class that described what is expected from the CardView widget """
-
-    new_cards = pyqtSignal()  #: Signal should be emited when cards change.
-
-    @abstractmethod
-    def __iter__(self):
-        """Returns an iterator of card objects"""
-
-    @abstractmethod
-    def flipped(self):
-        """Returns true of cards should be drawn face down"""
-
 
 class PlayerState(QObject):
     data_changed = pyqtSignal()
@@ -66,6 +28,13 @@ class PlayerState(QObject):
     def reset_bet(self):
         self.bet = 0
 
+
+class TableState(QObject):
+    data_changed = pyqtSignal()
+
+    def __init__(self):
+        super().__init__()
+        self.tablecards = Hand()
 
 class MoneyModel:
     pass
@@ -98,7 +67,19 @@ class GameModel(QObject):
         return active_player, not_active_player
 
     def new_card_event(self):
-        print('NewCardEvent')
+        if len(self.tablestate.tablecards.cards) == 0:
+            self.tablestate.tablecards.add_card(self.deck.draw())
+            self.tablestate.tablecards.add_card(self.deck.draw())
+            self.tablestate.tablecards.add_card(self.deck.draw())
+            print('3')
+        elif len(self.tablestate.tablecards.cards) == 3:
+            self.tablestate.tablecards.add_card(self.deck.draw())
+            print('4')
+        elif len(self.tablestate.tablecards.cards) == 4:
+            self.tablestate.tablecards.add_card(self.deck.draw())
+            print('5')
+        else:
+            self.evaluate_winner()
         for player in self.PlayerStates:
             if player.started:
                 player.set_active(True)
@@ -159,8 +140,8 @@ class GameModel(QObject):
     def call(self):
         players = self.who_is_active()
         if players[0].bet == players[1].bet and players[0].active != players[0].started:
-            self.new_card_event()
             print(f"{players[0].name} checked")
+            self.new_card_event()
         elif players[0].bet == players[1].bet:
             self.next_player()
             print(f"{players[0].name} checked")
@@ -178,6 +159,7 @@ class GameModel(QObject):
 
     def evaluate_winner(self):
 
+        print('Hej')
         self.next_round()
         # Måste ha if bets are equal då vill vi trigga nytt card event
 
@@ -200,7 +182,6 @@ class GameModel(QObject):
             player.reset_bet()
             #Släng kort på hand och dra nya
             player.data_changed.emit()
-
         #Kolla vem som började senast
         for player in self.PlayerStates:
             if player.started:
@@ -209,5 +190,6 @@ class GameModel(QObject):
             else:
                 player.set_starter(True)
                 player.set_active(True)
-        #Släng kort på bordet
+
+
         self.data_changed.emit()
