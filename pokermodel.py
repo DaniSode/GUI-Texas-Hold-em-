@@ -2,6 +2,44 @@ from PyQt5.QtCore import (pyqtSignal, QObject)
 from cardlib import *
 
 
+class CardModel(QObject):
+    """ Base class that described what is expected from the CardView widget """
+
+    new_cards = pyqtSignal()  #: Signal should be emited when cards change.
+
+    @abstractmethod
+    def __iter__(self):
+        """Returns an iterator of card objects"""
+
+    @abstractmethod
+    def flipped(self):
+        """Returns true of cards should be drawn face down"""
+
+
+class HandModel(Hand, CardModel):
+    def __init__(self):
+        Hand.__init__(self)
+        CardModel.__init__(self)
+        # Additional state needed by the UI
+        self.flipped_cards = False
+
+    def __iter__(self):
+        return iter(self.cards)
+
+    def flip(self):
+        # Flips over the cards (to hide them)
+        self.flipped_cards = not self.flipped_cards
+        self.new_cards.emit()  # something changed, better emit the signal!
+
+    def flipped(self):
+        # This model only flips all or no cards, so we don't care about the index.
+        # Might be different for other games though!
+        return self.flipped_cards
+
+    def add_card(self, card):
+        super().add_card(card)
+        self.new_cards.emit()  # something changed, better emit the signal!
+
 
 class PlayerState(QObject):
     data_changed = pyqtSignal()
@@ -22,13 +60,16 @@ class PlayerState(QObject):
 
     def set_starter(self, start):
         self.started = start
+        self.data_changed.emit()
 
     def won(self, amount):
         self.money += int(amount)
         self.wins += 1
+        self.data_changed.emit()
 
     def reset_bet(self):
         self.bet = 0
+        self.data_changed.emit()
 
 
 class TableState(QObject):
@@ -36,7 +77,8 @@ class TableState(QObject):
 
     def __init__(self):
         super().__init__()
-        self.tablecards = Hand()
+        self.tablecards = HandModel()
+
 
 class MoneyModel:
     pass
@@ -62,6 +104,7 @@ class GameModel(QObject):
         self.data_changed.emit()
         self.PlayerStates[0].set_active(True)
         self.PlayerStates[0].set_starter(True)
+        #self.tablestate.tablecards.add_card(self.deck.draw())
         for player in self.PlayerStates:
             player.hand.add_card((self.deck.draw()))
             player.hand.add_card((self.deck.draw()))
@@ -223,6 +266,8 @@ class GameModel(QObject):
         for player in self.PlayerStates:
             player.reset_bet()
             player.hand.clear_all_cards()
+            player.hand.add_card(self.deck.draw())
+            player.hand.add_card(self.deck.draw())
             player.data_changed.emit()
 
         #Kolla vem som började senast

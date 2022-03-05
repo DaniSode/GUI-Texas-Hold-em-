@@ -13,29 +13,7 @@ app = QApplication(sys.argv)
 # NOTE: You do NOT have to do it this way.
 # You might find it easier to make a Player-model, or a whole GameState-model instead.
 # This is just to make a small demo that you can use. You are free to modify
-class HandModel(Hand, CardModel):
-    def __init__(self):
-        Hand.__init__(self)
-        CardModel.__init__(self)
-        # Additional state needed by the UI
-        self.flipped_cards = False
 
-    def __iter__(self):
-        return iter(self.cards)
-
-    def flip(self):
-        # Flips over the cards (to hide them)
-        self.flipped_cards = not self.flipped_cards
-        self.new_cards.emit()  # something changed, better emit the signal!
-
-    def flipped(self):
-        # This model only flips all or no cards, so we don't care about the index.
-        # Might be different for other games though!
-        return self.flipped_cards
-
-    def add_card(self, card):
-        super().add_card(card)
-        self.new_cards.emit()  # something changed, better emit the signal!
 
 ###################
 # Card widget code:
@@ -185,15 +163,15 @@ class EditBox(QLineEdit):
 
 class PlayerView(QHBoxLayout):
 
-    def __init__(self, player_state, game):
+    def __init__(self, player_number, game):
         super().__init__()
-        self.player_state = player_state
+        #self.player_state = player_state
         self.game = game
-
-        hand = HandModel()
-        card_view = CardView(hand)
+        self.player_number = player_number
+        hand = self.game.PlayerStates[self.player_number].hand
+        self.card_view = CardView(hand)
         box = QHBoxLayout()
-        box.addWidget(card_view)
+        box.addWidget(self.card_view)
         player_card = QWidget()
         screen = app.primaryScreen()
         player_card.setFixedSize(int(screen.size().width() * 0.246), int(screen.size().height() * 0.3))
@@ -202,11 +180,11 @@ class PlayerView(QHBoxLayout):
         player_information = QVBoxLayout()
         player_information.setSpacing(0)
 
-        self.player_name = DisplayBox(f'{self.player_state.name}')
+        self.player_name = DisplayBox(f'{self.game.PlayerStates[self.player_number].name}')
         self.player_name.setFont(QFont('Felix Titling'))
         self.player_name.setStyleSheet('padding: 3px 0px; font-weight: bold')
-        self.money_box = DisplayBox(f'Money: {self.player_state.money}')
-        self.bet_box = DisplayBox(f'Bet: {self.player_state.bet}')
+        self.money_box = DisplayBox(f'Money: {self.game.PlayerStates[self.player_number].money}')
+        self.bet_box = DisplayBox(f'Bet: {self.game.PlayerStates[self.player_number].bet}')
         self.flip_button = QPushButton('Flip cards')
         self.flip_button.clicked.connect(lambda x, checked=True: hand.flip())
 
@@ -218,11 +196,12 @@ class PlayerView(QHBoxLayout):
         self.addWidget(player_card)
         self.addLayout(player_information)
 
-        self.player_state.data_changed.connect(self.update_views)
+        self.game.PlayerStates[self.player_number].data_changed.connect(self.update_views)
 
     def update_views(self):
-        self.money_box.setText(f'Money: {self.player_state.money}')
-        self.bet_box.setText(f'Bet: {self.player_state.bet}')
+        self.card_view.change_cards()
+        self.money_box.setText(f'Money: {self.game.PlayerStates[self.player_number].money}')
+        self.bet_box.setText(f'Bet: {self.game.PlayerStates[self.player_number].bet}')
 
 
 class PotInformation(QVBoxLayout):
@@ -246,12 +225,13 @@ class PotInformation(QVBoxLayout):
 
 class TableView(QWidget):
 
-    def __init__(self):
+    def __init__(self, game):
         super().__init__()
-        hand = HandModel()
-        card_view = CardView(hand)
+        self.game = game
+        hand = self.game.tablestate.tablecards
+        self.card_view = CardView(hand)
         box = QHBoxLayout()
-        box.addWidget(card_view)
+        box.addWidget(self.card_view)
         screen = app.primaryScreen()
         self.setFixedSize(int(screen.size().width() * 0.6), int(screen.size().height() * 0.3))
         self.setLayout(box)
@@ -432,7 +412,7 @@ class MainGameWindow(QMainWindow):
         h_layout = QHBoxLayout()
 
         # Lower left row
-        h_layout.addLayout(PlayerView(game.PlayerStates[0], game))
+        h_layout.addLayout(PlayerView(0, game))
         h_layout.addStretch(1)
 
         # Lower middle row
@@ -446,12 +426,12 @@ class MainGameWindow(QMainWindow):
 
         # Lower right row
         h_layout.addStretch(1)
-        h_layout.addLayout(PlayerView(game.PlayerStates[1], game))
+        h_layout.addLayout(PlayerView(1, game))
 
         # Middle row
         h_layout2 = QHBoxLayout()
         h_layout2.addStretch(1)
-        h_layout2.addWidget(TableView())
+        h_layout2.addWidget(TableView(game))
         h_layout2.addStretch(1)
 
         # Upper row
