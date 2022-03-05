@@ -262,7 +262,7 @@ class GameModel(QObject):
         """
         Resets the pot and player bets. Sets the new starting player as active.
         """
-        self.
+        self.endround = False
         self.pot = 0
         self.deck = StandardDeck()
         self.deck.shuffle()
