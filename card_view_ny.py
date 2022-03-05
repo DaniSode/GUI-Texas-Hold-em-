@@ -6,79 +6,18 @@ from abc import abstractmethod
 import sys
 from pokermodel import *
 
-# NOTE: This is just given as an example of how to use CardView.
-# It is expected that you will need to adjust things to make a game out of it. 
-
-###################
-# Models
-###################
-
 app = QApplication(sys.argv)
-class CardModel(QObject):
-    """ Base class that described what is expected from the CardView widget """
-
-    new_cards = pyqtSignal()  #: Signal should be emited when cards change.
-
-    @abstractmethod
-    def __iter__(self):
-        """Returns an iterator of card objects"""
-
-    @abstractmethod
-    def flipped(self):
-        """Returns true of cards should be drawn face down"""
-
-
-# A trivial card class (you should use the stuff you made in your library instead!
-class MySimpleCard:
-    def __init__(self, value, suit):
-        self.value = value
-        self.suit = suit
-
-    def get_value(self):
-        return self.value
-
-
-# You have made a class similar to this (hopefully):
-class Hand:
-    def __init__(self):
-        # Lets use some hardcoded values for most of this to start with
-        self.cards = [MySimpleCard(13, 2), MySimpleCard(7, 0), MySimpleCard(13, 1), MySimpleCard(13, 3), MySimpleCard(7, 3)]
-
-    def add_card(self, card):
-        self.cards.append(card)
-
 
 # We can extend this class to create a model, which updates the view whenever it has changed.
 # NOTE: You do NOT have to do it this way.
 # You might find it easier to make a Player-model, or a whole GameState-model instead.
 # This is just to make a small demo that you can use. You are free to modify
-class HandModel(Hand, CardModel):
-    def __init__(self):
-        Hand.__init__(self)
-        CardModel.__init__(self)
-        # Additional state needed by the UI
-        self.flipped_cards = False
 
-    def __iter__(self):
-        return iter(self.cards)
-
-    def flip(self):
-        # Flips over the cards (to hide them)
-        self.flipped_cards = not self.flipped_cards
-        self.new_cards.emit()  # something changed, better emit the signal!
-
-    def flipped(self):
-        # This model only flips all or no cards, so we don't care about the index.
-        # Might be different for other games though!
-        return self.flipped_cards
-
-    def add_card(self, card):
-        super().add_card(card)
-        self.new_cards.emit()  # something changed, better emit the signal!
 
 ###################
 # Card widget code:
 ###################
+
 
 class TableScene(QGraphicsScene):
     """ A scene with a table cloth background """
