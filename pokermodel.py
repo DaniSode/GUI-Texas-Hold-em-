@@ -86,6 +86,7 @@ class MoneyModel:
 
 
 class GameModel(QObject):
+    end = pyqtSignal()
     data_changed = pyqtSignal()
 
     def __init__(self):
@@ -294,4 +295,4 @@ class GameModel(QObject):
 
     def end_of_game(self):
         self.endgame = True
-        self.data_changed.emit()
+        self.end.emit()

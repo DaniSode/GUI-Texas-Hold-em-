@@ -437,8 +437,3 @@ class MainGameWindow(QMainWindow):
         self.setCentralWidget(widget)
 
         game.data_changed.emit()
-    #     self.game.endgame.data_changed.connect(self.EndGame())
-    #
-    # def EndGame(self):
-    #
-    #     sys.exit(app.exec_())
