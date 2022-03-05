@@ -75,6 +75,18 @@ class GameModel(QObject):
         self.next_round()
         self.data_changed.emit()
 
+    def all_in(self):
+        players = self.who_is_active()
+
+        amount = players[0].money
+        self.pot += int(amount)
+        players[0].bet += int(amount)
+        players[0].money -= int(amount)
+        players[0].data_changed.emit()
+
+        self.next_player()
+        self.data_changed.emit()
+
     def bet(self, amount):
         players = self.who_is_active()
 

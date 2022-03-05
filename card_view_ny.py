@@ -244,6 +244,8 @@ class PlayerView(QHBoxLayout):
         player_information.setSpacing(0)
 
         self.player_name = DisplayBox(f'{self.player_state.name}')
+        self.player_name.setFont(QFont('Felix Titling'))
+        self.player_name.setStyleSheet('padding: 3px 0px; font-weight: bold')
         self.money_box = DisplayBox(f'Money: {self.player_state.money}')
         self.bet_box = DisplayBox(f'Bet: {self.player_state.bet}')
         self.flip_button = QPushButton('Flip cards')
@@ -306,11 +308,14 @@ class ActionsView(QHBoxLayout):
         self.check_call_button.clicked.connect(self.call_check)
         self.fold_button = QPushButton('Fold')
         self.fold_button.clicked.connect(self.fold)
+        self.all_in_button = QPushButton('All In')
+        self.all_in_button.clicked.connect(self.all_in)
         self.raise_bet_button = QPushButton('Raise/Bet')
         self.raise_bet_button.clicked.connect(self.make_bet)
 
         self.addWidget(self.check_call_button)
         self.addWidget(self.fold_button)
+        self.addWidget(self.all_in_button)
         self.addWidget(self.raise_bet_button)
         self.addWidget(self.raise_amount)
 
@@ -322,6 +327,9 @@ class ActionsView(QHBoxLayout):
         self.GameModel.bet(self.get_raise_amount())
         self.raise_amount.setText('')
 
+    def all_in(self):
+        self.GameModel.all_in()
+
     def fold(self):
         self.GameModel.fold()
 
@@ -329,17 +337,18 @@ class ActionsView(QHBoxLayout):
         self.GameModel.call()
 
 
-class HeaderView:
-    def __init__(self, text):
+class HeaderView(QVBoxLayout):
+
+    def __init__(self):
         super().__init__()
-        self.text = QLabel(text)
-        self.text.setFrameStyle(QFrame.Panel | QFrame.Raised)
-        self.text.setStyleSheet("font: 18pt;")
-        self.text.setAlignment(Qt.AlignCenter)
+        header = QLabel('Welcome to a beautiful game of poopy poker')
+        header.setFrameStyle(QFrame.Panel | QFrame.Raised)
+        header.setFont(QFont('Chiller', 40))
+        header.setAlignment(Qt.AlignCenter)
         screen = app.primaryScreen()
-        self.text.setFixedSize(int(screen.size().width() * 0.4), int(screen.size().height() * 0.1))
+        header.setFixedSize(int(screen.size().width() * 0.75), int(screen.size().height() * 0.1))
         self.setAlignment(Qt.AlignCenter)
-        self.addWidget(self.text)
+        self.addWidget(header)
 
 
 class InformationView(QVBoxLayout):
@@ -349,7 +358,7 @@ class InformationView(QVBoxLayout):
         self.game = game
         self.text = QLabel()
         self.text.setFrameStyle(QFrame.Panel | QFrame.Raised)
-        self.text.setStyleSheet("font: 16pt;")
+        self.text.setFont(QFont('Constantia', 16))
         self.text.setAlignment(Qt.AlignCenter)
         screen = app.primaryScreen()
         self.text.setFixedSize(int(screen.size().width() * 0.1), int(screen.size().height() * 0.1))
@@ -469,7 +478,7 @@ class MainGameWindow(QMainWindow):
         # Upper row
         h_layout3 = QHBoxLayout()
         h_layout3.addStretch(1)
-        h_layout3.addLayout(HeaderView('Welcome to a game of poopy poker'))
+        h_layout3.addLayout(HeaderView())
         h_layout3.addStretch(1)
 
         # Add all layouts vertically
