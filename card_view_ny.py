@@ -19,14 +19,6 @@ app = QApplication(sys.argv)
 ###################
 
 
-class TableScene(QGraphicsScene):
-    """ A scene with a table cloth background """
-    def __init__(self):
-        super().__init__()
-        # self.tile = QPixmap('cards/table.png')
-        # self.setBackgroundBrush(QBrush(self.tile))
-
-
 class CardItem(QGraphicsSvgItem):
     """ A simple overloaded QGraphicsSvgItem that also stores the card position """
     def __init__(self, renderer, position):
@@ -63,7 +55,6 @@ class CardView(QGraphicsView):
         :param card_spacing: Spacing between the visualized cards.
         :param padding: Padding of table area around the visualized cards.
         """
-        self.scene = TableScene()
         super().__init__(self.scene)
 
         self.card_spacing = card_spacing

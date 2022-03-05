@@ -38,10 +38,6 @@ class CardModel(QObject):
     @abstractmethod
     def flipped(self):
         """Returns true of cards should be drawn face down"""
-class
-
-
-
 
 
 class PlayerState(QObject):
