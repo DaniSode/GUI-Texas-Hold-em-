@@ -383,11 +383,6 @@ class SetupWindow(QMainWindow):
         self.w.show()
         self.close()
 
-    # def set_player_info(self):
-    #
-    #     self.GameModel.start_game(self.layout.PlayerSetup_1.enter_info.text())
-    #     self.button.clicked.connect(self.set_player_info())
-
 
 class MainGameWindow(QMainWindow):
     def __init__(self, game):
@@ -442,3 +437,8 @@ class MainGameWindow(QMainWindow):
         self.setCentralWidget(widget)
 
         game.data_changed.emit()
+    #     self.game.endgame.data_changed.connect(self.EndGame())
+    #
+    # def EndGame(self):
+    #
+    #     sys.exit(app.exec_())

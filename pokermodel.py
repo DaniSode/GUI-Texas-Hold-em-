@@ -90,7 +90,6 @@ class GameModel(QObject):
 
     def __init__(self):
         super().__init__()
-        self.endround = False
         self.endgame = False
         self.PlayerStates = []
         self.pot = 0
