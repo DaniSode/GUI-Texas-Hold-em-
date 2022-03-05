@@ -217,8 +217,6 @@ class EditBox(QLineEdit):
 
     def __init__(self):
         super().__init__()
-        #self.label = label
-        #self.setText(f'{self.label}')
         self.setStyleSheet("padding: 3px 0px;")
         screen = app.primaryScreen()
         self.setFixedWidth(int(screen.size().width() * 0.05))
@@ -262,7 +260,6 @@ class PlayerView(QHBoxLayout):
         self.player_state.data_changed.connect(self.update_views)
 
     def update_views(self):
-
         self.money_box.setText(f'Money: {self.player_state.money}')
         self.bet_box.setText(f'Bet: {self.player_state.bet}')
 
@@ -273,6 +270,7 @@ class PotInformation(QVBoxLayout):
         super().__init__()
         self.game = game
         pot_label = QLabel('Pot')
+        pot_label.setFont(QFont('Times New Roman', 12))
         pot_label.setAlignment(Qt.AlignCenter)
         self.amount_box = DisplayBox('')
         self.addWidget(pot_label)
@@ -321,7 +319,8 @@ class ActionsView(QHBoxLayout):
         self.addWidget(self.raise_amount)
 
     def get_raise_amount(self):
-
+        if self.raise_amount.text() == '':
+            self.raise_amount.setText('0')
         return self.raise_amount.text()
 
     def make_bet(self):
