@@ -297,18 +297,6 @@ class HeaderView(QVBoxLayout):
         self.addWidget(header)
 
 
-class EndGame(QObject):
-    def __init__(self):
-        super().__init__()
-
-        self.button.clicked.connect(self.show_popup)
-
-    def show_popup(self):
-        msg = QMessageBox
-        msg.setText("Do you want to move on to the next round?")
-        x = msg.exec_()
-
-
 class InformationView(QVBoxLayout):
 
     def __init__(self, game):
