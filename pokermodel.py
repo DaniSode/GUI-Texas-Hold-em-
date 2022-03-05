@@ -122,6 +122,12 @@ class GameModel(QObject):
     def new_card_event(self):
         self.PlayerStates[0].bet = 0
         self.PlayerStates[1].bet = 0
+
+        if self.PlayerStates[1].money == 0 and self.PlayerStates[1].money == 0:
+            while len(self.tablestate.tablecards.cards) != 5:
+                self.tablestate.tablecards.add_card(self.deck.draw())
+            self.evaluate_winner()
+
         if len(self.tablestate.tablecards.cards) == 0:
             self.tablestate.tablecards.add_card(self.deck.draw())
             self.tablestate.tablecards.add_card(self.deck.draw())
@@ -223,10 +229,10 @@ class GameModel(QObject):
         print(f'{self.PlayerStates[1].name} has {str(bph1)}')
         if bph0 > bph1:
             self.PlayerStates[0].won(self.pot)
-            print(f'{self.PlayerStates[0].name} wins')
+            print(f'Winner is and the pot of {self.pot} goes to {self.PlayerStates[0].name}')
         elif bph1 > bph0:
             self.PlayerStates[1].won(self.pot)
-            print(f'{self.PlayerStates[1].name} wins')
+            print(f'Winner is and the pot of {self.pot} goes to {self.PlayerStates[1].name}')
         else:
             self.PlayerStates[0].won(self.pot/2)
             self.PlayerStates[1].won(self.pot/2)
@@ -246,17 +252,23 @@ class GameModel(QObject):
             PlayerState[1].reset_bet()
             self.end_of_game()
         else:
-            self.next_round()
+            print('Do you want to move on to the next round?')
+            aa = input('Press enter')
+            if aa == '':
+                self.next_round()
 
     def next_player(self):
         """
         Switches the active player
         """
+
         for player in self.PlayerStates:
             if player.active:
                 player.set_active(False)
             else:
                 player.set_active(True)
+
+
 
     def next_round(self):
         """
