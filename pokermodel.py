@@ -12,14 +12,21 @@ class PlayerState(QObject):
         self.bet = 0
         self.wins = 0
         self.active = False
+        self.started = False
 
     def set_active(self, active):
         self.active = active
         self.data_changed.emit()
 
-    def won(self):
+    def set_starter(self, start):
+        self.started = start
+
+    def won(self, amount):
+        self.money += int(amount)
         self.wins += 1
-        self.data_changed.emit()
+
+    def reset_bet(self):
+        self.bet = 0
 
 
 class MoneyModel:
@@ -35,6 +42,9 @@ class GameModel(QObject):
         self.pot = 0
 
     def start_game(self, player_infos):
+        """
+        Sets player names and starting money based on input. Sets player 1 as the starting player.
+        """
         self.PlayerStates.append(PlayerState(player_infos[0], player_infos[2]))
         self.PlayerStates.append(PlayerState(player_infos[1], player_infos[2]))
         self.data_changed.emit()
@@ -44,21 +54,34 @@ class GameModel(QObject):
     def who_is_active(self):
         for player in self.PlayerStates:
             if player.active:
-                player.set_active(False)
+                active_player = player
             else:
+                not_active_player = player
+        return active_player, not_active_player
+
+    def new_card_event(self):
+        print('NewCardEvent')
+        for player in self.PlayerStates:
+            if player.started:
                 player.set_active(True)
+            else:
+                player.set_active(False)
 
     def fold(self):
-        pass
+        players = self.who_is_active()
+
+        players[1].won(self.pot)
+        players[1].data_changed.emit()
+        self.next_round()
+        self.data_changed.emit()
 
     def bet(self, amount):
+        players = self.who_is_active()
 
-        for player in self.PlayerStates:
-            if player.active:
-                self.pot += int(amount)
-                player.bet += int(amount)
-                player.money -= int(amount)
-                player.data_changed.emit()
+        self.pot += int(amount)
+        players[0].bet += int(amount)
+        players[0].money -= int(amount)
+        players[0].data_changed.emit()
 
         self.next_player()
         self.data_changed.emit()

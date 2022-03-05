@@ -343,16 +343,25 @@ class HeaderView:
 
 
 class InformationView(QVBoxLayout):
-    def __init__(self, text):
+
+    def __init__(self, game):
         super().__init__()
-        self.text = text
-        text = QLabel(self.text)
-        text.setFrameStyle(QFrame.Panel | QFrame.Raised)
-        text.setAlignment(Qt.AlignCenter)
+        self.game = game
+        self.text = QLabel()
+        self.text.setFrameStyle(QFrame.Panel | QFrame.Raised)
+        self.text.setStyleSheet("font: 16pt;")
+        self.text.setAlignment(Qt.AlignCenter)
         screen = app.primaryScreen()
-        text.setFixedSize(int(screen.size().width() * 0.1), int(screen.size().height() * 0.1))
+        self.text.setFixedSize(int(screen.size().width() * 0.1), int(screen.size().height() * 0.1))
         self.setAlignment(Qt.AlignCenter)
-        self.addWidget(text)
+        self.addWidget(self.text)
+
+        self.game.data_changed.connect(self.update_view)
+
+    def update_view(self):
+        #players = self.game.who_is_active()
+        test = [player.name for player in self.game.PlayerStates if player.active]
+        self.text.setText(f"{test[0]}'s turn")
 
 
 class LabelAndBox(QVBoxLayout):
@@ -460,7 +469,7 @@ class MainGameWindow(QMainWindow):
         # Upper row
         h_layout3 = QHBoxLayout()
         h_layout3.addStretch(1)
-        h_layout3.addLayout(InformationView("Welcome to Texas Hold'em"))
+        h_layout3.addLayout(HeaderView('Welcome to a game of poopy poker'))
         h_layout3.addStretch(1)
 
         # Add all layouts vertically
@@ -474,3 +483,5 @@ class MainGameWindow(QMainWindow):
         widget = QWidget()
         widget.setLayout(main_vertical)
         self.setCentralWidget(widget)
+
+        game.data_changed.emit()
