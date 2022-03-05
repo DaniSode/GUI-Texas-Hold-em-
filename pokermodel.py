@@ -7,6 +7,7 @@ class PlayerState(QObject):
 
     def __init__(self, name, money):
         super().__init__()
+        self.hand = HandModel()
         self.name = name
         self.money = int(money)
         self.bet = 0
@@ -47,6 +48,9 @@ class GameModel(QObject):
         super().__init__()
         self.PlayerStates = []
         self.pot = 0
+        self.deck = StandardDeck()
+        self.deck.shuffle()
+        self.tablestate = TableState()
 
     def start_game(self, player_infos):
         """
@@ -57,6 +61,9 @@ class GameModel(QObject):
         self.data_changed.emit()
         self.PlayerStates[0].set_active(True)
         self.PlayerStates[0].set_starter(True)
+        for player in self.PlayerStates:
+            player.hand.add_card((self.deck.draw()))
+            player.hand.add_card((self.deck.draw()))
 
     def who_is_active(self):
         for player in self.PlayerStates:
@@ -178,9 +185,16 @@ class GameModel(QObject):
         Resets the pot and player bets. Sets the new starting player as active.
         """
         self.pot = 0
+
+        self.deck = StandardDeck()
+        self.deck.shuffle()
+
+        self.tablestate.tablecards.clear_all_cards()
+
+
         for player in self.PlayerStates:
             player.reset_bet()
-            #Släng kort på hand och dra nya
+            player.hand.clear_all_cards()
             player.data_changed.emit()
         #Kolla vem som började senast
         for player in self.PlayerStates:

@@ -190,6 +190,12 @@ class Hand:
         kept_cards = [self.cards[i] for i in range(len(self.cards)) if i not in indices]
         self.cards = kept_cards
 
+    def clear_all_cards(self):
+        """
+        Clears the hand of all cards
+        """
+        self.cards.clear()
+
     def sort(self):
         """A method that sort the cards in order depending on their value.
         """

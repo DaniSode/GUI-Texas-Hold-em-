@@ -109,7 +109,7 @@ def read_cards():
     :return: Dictionary of SVG renderers
     """
     all_cards = dict()  # Dictionaries let us have convenient mappings between cards and their images
-    for suit_file, suit in zip('HDSC', range(4)):  # Check the order of the suits here!!!
+    for suit_file, suit in zip('HSCD', range(1, 5)):  # Check the order of the suits here!!!
         for value_file, value in zip(['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'], range(2, 15)):
             file = value_file + suit_file
             key = (value, suit)  # I'm choosing this tuple to be the key for this dictionary
@@ -153,7 +153,7 @@ class CardView(QGraphicsView):
         self.scene.clear()
         for i, card in enumerate(self.model):
             # The ID of the card in the dictionary of images is a tuple with (value, suit), both integers
-            graphics_key = (card.get_value(), card.suit)
+            graphics_key = (card.get_value(), card.suit.value)
             renderer = self.back_card if self.model.flipped() else self.all_cards[graphics_key]
             c = CardItem(renderer, i)
 
