@@ -83,6 +83,7 @@ class GameModel(QObject):
         players[0].bet += int(amount)
         players[0].money -= int(amount)
         players[0].data_changed.emit()
+        print(f'{players[0].name} is all in!')
 
         self.next_player()
         self.data_changed.emit()
@@ -91,27 +92,38 @@ class GameModel(QObject):
         players = self.who_is_active()
         if int(amount) > players[0].money:
             print("You don't have enough money!")
+        elif int(amount) == 0 or amount == '':
+            print("You need to atleast bet 1 or check!")
+        elif int(amount) <= players[1].bet-players[0].bet:
+            print("You need to call your opponent or raise them!")
         else:
+            if players[0].bet == players[1].bet:
+                print(f'{players[0].name} bet {amount}')
+            else:
+                print(f'{players[0].name} raised {amount}')
             self.pot += int(amount)
             players[0].bet += int(amount)
             players[0].money -= int(amount)
+
             players[0].data_changed.emit()
             self.next_player()
             self.data_changed.emit()
-
 
     def call(self):
         players = self.who_is_active()
         if players[0].bet == players[1].bet and players[0].active != players[0].started:
             self.new_card_event()
+            print(f"{players[0].name} checked")
         elif players[0].bet == players[1].bet:
             self.next_player()
+            print(f"{players[0].name} checked")
         else:
             diff_amount = players[1].bet-players[0].bet
             players[0].bet += diff_amount
             players[0].money -= diff_amount
             self.pot += diff_amount
             self.new_card_event()
+            print(f"{players[0].name} called {players[1].name}")
 
         players[0].data_changed.emit()
         self.data_changed.emit()

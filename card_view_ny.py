@@ -304,6 +304,7 @@ class ActionsView(QHBoxLayout):
         super().__init__()
         self.GameModel = GameModel
         self.raise_amount = EditBox()
+        self.raise_amount.setValidator(QIntValidator(0, 10000000000))
         self.check_call_button = QPushButton('Check/Call')
         self.check_call_button.clicked.connect(self.call_check)
         self.fold_button = QPushButton('Fold')
@@ -394,7 +395,6 @@ class SetupView(QVBoxLayout):
         self.lbl_box_2 = LabelAndBox('Name Player 2:')
         self.lbl_box_3 = LabelAndBox('Stake:')
         self.lbl_box_3.enter_info.setValidator(QIntValidator(0, 10000000000))
-
         self.addLayout(self.lbl_box_1)
         self.addStretch(1)
         self.addLayout(self.lbl_box_2)
@@ -403,7 +403,12 @@ class SetupView(QVBoxLayout):
         self.addStretch(1)
 
     def get_text(self):
-
+        if self.lbl_box_1.enter_info.text() == '':
+            self.lbl_box_1.enter_info.setText('Player 1')
+        if self.lbl_box_2.enter_info.text() == '':
+            self.lbl_box_2.enter_info.setText('Player 2')
+        if self.lbl_box_3.enter_info.text() == '':
+            self.lbl_box_3.enter_info.setText('100')
         return self.lbl_box_1.enter_info.text(), self.lbl_box_2.enter_info.text(), self.lbl_box_3.enter_info.text()
 
 
