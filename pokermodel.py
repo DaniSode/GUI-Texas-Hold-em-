@@ -90,6 +90,7 @@ class GameModel(QObject):
 
     def __init__(self):
         super().__init__()
+        self.end
         self.endgame = False
         self.PlayerStates = []
         self.pot = 0
@@ -261,6 +262,7 @@ class GameModel(QObject):
         """
         Resets the pot and player bets. Sets the new starting player as active.
         """
+        self.
         self.pot = 0
         self.deck = StandardDeck()
         self.deck.shuffle()
