@@ -1,6 +1,14 @@
 from PyQt5.QtCore import (pyqtSignal, QObject)
 from cardlib import *
 
+class HandModel()
+    pass
+
+class
+
+
+
+
 
 class PlayerState(QObject):
     data_changed = pyqtSignal()
