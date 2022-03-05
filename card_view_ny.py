@@ -287,7 +287,7 @@ class HeaderView(QVBoxLayout):
 
     def __init__(self):
         super().__init__()
-        header = QLabel('Welcome to a beautiful game of poopy poker')
+        header = QLabel('Welcome to a beautiful game of Poker')
         header.setFrameStyle(QFrame.Panel | QFrame.Raised)
         header.setFont(QFont('Comic Sans MS', 40)) # Chiller - typsnitt
         header.setAlignment(Qt.AlignCenter)

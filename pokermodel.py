@@ -119,6 +119,8 @@ class GameModel(QObject):
         return active_player, not_active_player
 
     def new_card_event(self):
+        self.PlayerStates[0].bet = 0
+        self.PlayerStates[1].bet = 0
         if len(self.tablestate.tablecards.cards) == 0:
             self.tablestate.tablecards.add_card(self.deck.draw())
             self.tablestate.tablecards.add_card(self.deck.draw())
@@ -146,10 +148,10 @@ class GameModel(QObject):
 
     def all_in(self):
         players = self.who_is_active()
+        amount = players[0].money
         if players[0].money + players[0].bet > players[1].money + players[1].bet:
             print("You can't bet more than your opponent's money")
-        elif players[0].money == players[1].bet:
-            amount = players[0].money
+        elif players[0].money + players[0].bet == players[1].bet:
             self.pot += int(amount)
             players[0].bet += int(amount)
             players[0].money -= int(amount)
@@ -160,18 +162,15 @@ class GameModel(QObject):
             self.evaluate_winner()
             self.data_changed.emit()
         else:
-            amount = players[0].money
             self.pot += int(amount)
             players[0].bet += int(amount)
             players[0].money -= int(amount)
             players[0].data_changed.emit()
             print(f'{players[0].name} is all in!')
-
             self.next_player()
             self.data_changed.emit()
 
     def bet(self, raise_amount):
-
         players = self.who_is_active()
         amount = int(raise_amount) + int(players[1].bet) - int(players[0].bet)
         if int(amount) > players[0].money:
@@ -192,7 +191,6 @@ class GameModel(QObject):
             self.pot += int(amount)
             players[0].bet += int(amount)
             players[0].money -= int(amount)
-
             players[0].data_changed.emit()
             self.next_player()
             self.data_changed.emit()
@@ -212,7 +210,7 @@ class GameModel(QObject):
             self.pot += diff_amount
             print(f"{players[0].name} called {players[1].name}")
             if players[0].money == 0:
-                print(f"{players[0].name} is all in!")
+                self.all_in()
             self.new_card_event()
         players[0].data_changed.emit()
         self.data_changed.emit()
@@ -233,11 +231,19 @@ class GameModel(QObject):
             self.PlayerStates[1].won(self.pot/2)
             print('split pot')
         self.data_changed.emit()
+
         if self.PlayerStates[0].money == 0:
             print(f'The Winner of The Game is {self.PlayerStates[1].name}')
-
+            self.pot = 0
+            PlayerState[0].reset_bet()
+            PlayerState[1].reset_bet()
+            # Exit application
         elif self.PlayerStates[1].money == 0:
             print(f'The Winner of The Game is {self.PlayerStates[0].name}')
+            self.pot = 0
+            PlayerState[0].reset_bet()
+            PlayerState[1].reset_bet()
+            # Exit application
         else:
             self.next_round()
         # Måste ha if bets are equal då vill vi trigga nytt card event
