@@ -70,7 +70,7 @@ class GameModel(QObject):
     def fold(self):
         players = self.who_is_active()
         print(f"{players[0].name} folded")
-        print(f"Winner is {players[1].name}")
+        print(f"Winner is and the pot of {self.pot} goes to {players[1].name}")
         players[1].won(self.pot)
         players[1].data_changed.emit()
         self.next_round()
@@ -103,7 +103,7 @@ class GameModel(QObject):
             if players[0].bet == players[1].bet:
                 print(f'{players[0].name} bet {amount}')
             else:
-                print(f'{players[0].name} raised {amount}')
+                print(f'{players[0].name} called {players[1].name} and raised {int(amount)-int(players[1].bet)}')
 
             self.pot += int(amount)
             players[0].bet += int(amount)
@@ -126,11 +126,10 @@ class GameModel(QObject):
             players[0].bet += diff_amount
             players[0].money -= diff_amount
             self.pot += diff_amount
-            self.new_card_event()
             print(f"{players[0].name} called {players[1].name}")
             if players[0].money == 0:
                 print(f"{players[0].name} is all in!")
-
+            self.new_card_event()
         players[0].data_changed.emit()
         self.data_changed.emit()
 
