@@ -78,19 +78,23 @@ class GameModel(QObject):
 
     def all_in(self):
         players = self.who_is_active()
+        if players[0].money > players[1].money:
+            print("You can't bet more than your opponent's money")
+        else:
+            amount = players[0].money
+            self.pot += int(amount)
+            players[0].bet += int(amount)
+            players[0].money -= int(amount)
+            players[0].data_changed.emit()
+            print(f'{players[0].name} is all in!')
 
-        amount = players[0].money
-        self.pot += int(amount)
-        players[0].bet += int(amount)
-        players[0].money -= int(amount)
-        players[0].data_changed.emit()
-        print(f'{players[0].name} is all in!')
+            self.next_player()
+            self.data_changed.emit()
 
-        self.next_player()
-        self.data_changed.emit()
+    def bet(self, raise_amount):
 
-    def bet(self, amount):
         players = self.who_is_active()
+        amount = int(raise_amount) + int(players[1].bet) - int(players[0].bet)
         if int(amount) > players[0].money:
             print("You don't have enough money!")
         elif int(amount) == 0 or amount == '':
@@ -99,12 +103,13 @@ class GameModel(QObject):
             print("You need to call your opponent or raise them!")
         elif int(amount)-players[0].money == 0:
             print("Are you sure you want to go all in?")
+        elif int(amount) > players[1].money:
+            print("You can't bet more than your opponent's money")
         else:
             if players[0].bet == players[1].bet:
                 print(f'{players[0].name} bet {amount}')
             else:
-                print(f'{players[0].name} called {players[1].name} and raised {int(amount)-int(players[1].bet)}')
-
+                print(f'{players[0].name} called {players[1].name} and raised {int(raise_amount)}')
             self.pot += int(amount)
             players[0].bet += int(amount)
             players[0].money -= int(amount)
