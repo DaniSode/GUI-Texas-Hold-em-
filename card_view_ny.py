@@ -37,6 +37,7 @@ class MySimpleCard:
     def get_value(self):
         return self.value
 
+
 # You have made a class similar to this (hopefully):
 class Hand:
     def __init__(self):
@@ -282,8 +283,6 @@ class PotInformation(QVBoxLayout):
         self.amount_box.setText(f'{self.game.pot}')
 
 
-
-
 class TableView(QWidget):
 
     def __init__(self):
@@ -304,9 +303,9 @@ class ActionsView(QHBoxLayout):
         self.GameModel = GameModel
         self.raise_amount = EditBox()
         self.check_call_button = QPushButton('Check/Call')
-
+        self.check_call_button.clicked.connect(self.call_check)
         self.fold_button = QPushButton('Fold')
-
+        self.fold_button.clicked.connect(self.fold)
         self.raise_bet_button = QPushButton('Raise/Bet')
         self.raise_bet_button.clicked.connect(self.make_bet)
 
@@ -322,6 +321,25 @@ class ActionsView(QHBoxLayout):
     def make_bet(self):
         self.GameModel.bet(self.get_raise_amount())
         self.raise_amount.setText('')
+
+    def fold(self):
+        self.GameModel.fold()
+
+    def call_check(self):
+        self.GameModel.call()
+
+
+class HeaderView:
+    def __init__(self, text):
+        super().__init__()
+        self.text = QLabel(text)
+        self.text.setFrameStyle(QFrame.Panel | QFrame.Raised)
+        self.text.setStyleSheet("font: 18pt;")
+        self.text.setAlignment(Qt.AlignCenter)
+        screen = app.primaryScreen()
+        self.text.setFixedSize(int(screen.size().width() * 0.4), int(screen.size().height() * 0.1))
+        self.setAlignment(Qt.AlignCenter)
+        self.addWidget(self.text)
 
 
 class InformationView(QVBoxLayout):
@@ -351,13 +369,13 @@ class LabelAndBox(QVBoxLayout):
 
 
 class SetupView(QVBoxLayout):
+
     def __init__(self):
         super().__init__()
         self.lbl_box_1 = LabelAndBox('Name Player 1:')
         self.lbl_box_2 = LabelAndBox('Name Player 2:')
         self.lbl_box_3 = LabelAndBox('Stake:')
         self.lbl_box_3.enter_info.setValidator(QIntValidator(0, 1000000))
-
 
         self.addLayout(self.lbl_box_1)
         self.addStretch(1)
@@ -417,21 +435,21 @@ class MainGameWindow(QMainWindow):
         h_layout = QHBoxLayout()
 
         # Lower left row
-        h_layout.addLayout(PlayerView(game.PlayerStates[0],game))
+        h_layout.addLayout(PlayerView(game.PlayerStates[0], game))
         h_layout.addStretch(1)
 
         # Lower middle row
         h_lay = QVBoxLayout()
         h_lay.addLayout(PotInformation(game))
         h_lay.addStretch(1)
-        h_lay.addLayout(InformationView("Player 1's turn"))
+        h_lay.addLayout(InformationView(game))
         h_lay.addStretch(1)
         h_lay.addLayout(ActionsView(game))
         h_layout.addLayout(h_lay)
 
         # Lower right row
         h_layout.addStretch(1)
-        h_layout.addLayout(PlayerView(game.PlayerStates[1],game))
+        h_layout.addLayout(PlayerView(game.PlayerStates[1], game))
 
         # Middle row
         h_layout2 = QHBoxLayout()
