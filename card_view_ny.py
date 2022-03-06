@@ -400,10 +400,10 @@ class SetupView(QVBoxLayout):
         self.addStretch(1)
         self.addLayout(self.lbl_box_3)
         self.addStretch(1)
-        self.addLayout(self.lbl_box_4)
-        self.addStretch(1)
-        self.addLayout(self.lbl_box_5)
-        self.addStretch(1)
+        # self.addLayout(self.lbl_box_4)
+        # self.addStretch(1)
+        # self.addLayout(self.lbl_box_5)
+        # self.addStretch(1)
 
     def get_text(self):
         if self.lbl_box_1.enter_info.text() == '':
@@ -412,10 +412,10 @@ class SetupView(QVBoxLayout):
             self.lbl_box_2.enter_info.setText('Player 2')
         if self.lbl_box_3.enter_info.text() == '':
             self.lbl_box_3.enter_info.setText('100')
-        if self.lbl_box_4.enter_info.text() == '':
-            self.lbl_box_4.enter_info.setText('10')
-        if self.lbl_box_5.enter_info.text() == '':
-            self.lbl_box_5.enter_info.setText('20')
+        # if self.lbl_box_4.enter_info.text() == '':
+        #     self.lbl_box_4.enter_info.setText('10')
+        # if self.lbl_box_5.enter_info.text() == '':
+        #     self.lbl_box_5.enter_info.setText('20')
         return self.lbl_box_1.enter_info.text(), self.lbl_box_2.enter_info.text(), self.lbl_box_3.enter_info.text(), self.lbl_box_4.enter_info.text(), self.lbl_box_5.enter_info.text()
 
 
