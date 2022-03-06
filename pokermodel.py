@@ -1,7 +1,6 @@
 from PyQt5.QtCore import (pyqtSignal, QObject)
 from cardlib import *
 
-
 class CardModel(QObject):
     """ Base class that described what is expected from the CardView widget """
 
@@ -102,6 +101,7 @@ class GameModel(QObject):
     signal_all_in = pyqtSignal(str)
     signal_winner = pyqtSignal(str)
     signal_endgame = pyqtSignal(str)
+    signal_endround = pyqtSignal(int)
     data_changed = pyqtSignal()
 
     def __init__(self):

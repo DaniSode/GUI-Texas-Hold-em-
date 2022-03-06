@@ -321,7 +321,7 @@ class InformationView(QVBoxLayout):
         self.addWidget(self.player_turn)
 
 
-        self.game.data_changed.connect(self.update_view)
+        self.game.data_changed.connect(self.update_player)
         self.game.signal_bet.connect(self.update_view_bet)
         self.game.signal_call.connect(self.update_view_call)
         self.game.signal_fold.connect(self.update_view_fold)
@@ -329,7 +329,7 @@ class InformationView(QVBoxLayout):
         self.game.signal_winner.connect(self.update_winner)
         self.game.signal_endgame.connect(self.end_game)
 
-    def update_view(self):
+    def update_player(self):
 
         test = [player.name for player in self.game.PlayerStates if player.active]
         self.player_turn.setText(f"\n{test[0]}'s turn")
