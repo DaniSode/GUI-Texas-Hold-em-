@@ -299,10 +299,16 @@ class HeaderView(QVBoxLayout):
 
 class InformationView(QVBoxLayout):
 
-    def __init__(self, game, action_view):
+    def __init__(self, game):
         super().__init__()
-        self.action_view = action_view
+
         self.game = game
+
+        self.player_turn = QLabel()
+        self.player_turn.setAlignment(Qt.AlignCenter)
+        self.player_turn.setFont(QFont('Constantia', 16))
+        self.player_turn.setStyleSheet("color: #35322f")
+
         self.text = QLabel()
         self.text.setFrameStyle(QFrame.Panel | QFrame.Raised)
         self.text.setFont(QFont('Constantia', 16))
@@ -311,6 +317,8 @@ class InformationView(QVBoxLayout):
         self.text.setFixedSize(int(screen.size().width() * 0.15), int(screen.size().height() * 0.1))
         self.setAlignment(Qt.AlignCenter)
         self.addWidget(self.text)
+        self.addWidget(self.player_turn)
+
 
         self.game.data_changed.connect(self.update_view)
         self.game.signal_bet.connect(self.update_view_bet)
@@ -321,11 +329,24 @@ class InformationView(QVBoxLayout):
     def update_view(self):
 
         test = [player.name for player in self.game.PlayerStates if player.active]
-        self.text.setText(f"Player 2 betar 70\n{test[0]}'s turn")
+        self.player_turn.setText(f"\n{test[0]}'s turn")
 
     def update_view_bet(self, text):
 
         self.text.setText(text)
+
+    def update_view_call(self, text):
+
+        self.text.setText(text)
+
+    def update_view_fold(self, text):
+
+        self.text.setText(text)
+
+    def update_view_all_in(self, text):
+
+        self.text.setText(text)
+
 
 
 class LabelAndBox(QVBoxLayout):
@@ -421,25 +442,19 @@ class MainGameWindow(QMainWindow):
         h_layout.addStretch(1)
 
         # Lower middle row
-        action_view = ActionsView(game)
-
-        # h_lay = QVBoxLayout()
-        # h_lay.addLayout(PotInformation(game))
-        # h_lay.addStretch(1)
-        # h_lay.addLayout(InformationView(game))
-        # h_lay.addStretch(1)
-        # h_lay.addLayout(ActionsView(game))
-        # h_layout.addLayout(h_lay)
 
 
-        # OLD
-        # h_lay = QVBoxLayout()
-        # h_lay.addLayout(PotInformation(game))
-        # h_lay.addStretch(1)
-        # h_lay.addLayout(InformationView(game))
-        # h_lay.addStretch(1)
-        # h_lay.addLayout(ActionsView(game))
-        # h_layout.addLayout(h_lay)
+
+
+
+
+        h_lay = QVBoxLayout()
+        h_lay.addLayout(PotInformation(game))
+        h_lay.addStretch(1)
+        h_lay.addLayout(InformationView(game))
+        h_lay.addStretch(1)
+        h_lay.addLayout(ActionsView(game))
+        h_layout.addLayout(h_lay)
 
         # Lower right row
         h_layout.addStretch(1)
