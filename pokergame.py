@@ -1,10 +1,10 @@
-from pokermodel import *
-from card_view_ny import *
+# DAT-171: Computer assignment 3
+# Authors: Daniel Soderqvist and Felix Mare
+
+from pokerview import *
 import sys
 
 def main():
-
-
     app = QApplication(sys.argv)
     game = GameModel()
     window = SetupWindow(game)

@@ -1,4 +1,4 @@
-# DAT-171: Computer assignment 2
+# DAT-171: Computer assignment 3
 # Authors: Daniel Soderqvist and Felix Mare
 
 

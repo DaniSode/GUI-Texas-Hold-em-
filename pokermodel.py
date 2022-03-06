@@ -1,5 +1,10 @@
+# DAT-171: Computer assignment 3
+# Authors: Daniel Soderqvist and Felix Mare
+
+
 from PyQt5.QtCore import (pyqtSignal, QObject)
 from cardlib import *
+
 
 class CardModel(QObject):
     """ Base class that described what is expected from the CardView widget """
@@ -16,7 +21,9 @@ class CardModel(QObject):
 
 
 class HandModel(Hand, CardModel):
-
+    """
+    A class representing the handmodel.
+    """
     def __init__(self):
         Hand.__init__(self)
         CardModel.__init__(self)
@@ -27,13 +34,16 @@ class HandModel(Hand, CardModel):
         return iter(self.cards)
 
     def flip(self):
-        # Flips over the cards (to hide them)
+        """
+        Flips over the cards (to hide them)
+        """
         self.flipped_cards = not self.flipped_cards
         self.new_cards.emit()  # something changed, better emit the signal!
 
     def flipped(self):
-        # This model only flips all or no cards, so we don't care about the index.
-        # Might be different for other games though!
+        """
+        This model only flips all or no cards
+        """
         return self.flipped_cards
 
     def add_card(self, card):
@@ -42,6 +52,9 @@ class HandModel(Hand, CardModel):
 
 
 class PlayerState(QObject):
+    """
+    A Class representing a player state containing name, money, bet etc.
+    """
     data_changed = pyqtSignal()
 
     def __init__(self, name, money):
@@ -55,24 +68,39 @@ class PlayerState(QObject):
         self.started = False
 
     def set_active(self, active):
+        """
+        A method that sets a player as active or not.
+        """
         self.active = active
         self.data_changed.emit()
 
     def set_starter(self, start):
+        """
+        A method that sets if a player has started a round or not.
+        """
         self.started = start
         self.data_changed.emit()
 
     def won(self, amount):
+        """
+        A method that adds the pot to the player's money.
+        """
         self.money += int(amount)
         self.wins += 1
         self.data_changed.emit()
 
     def reset_bet(self):
+        """
+        A method that resets a player's bet.
+        """
         self.bet = 0
         self.data_changed.emit()
 
 
 class TableState(QObject):
+    """
+    A class representing the table containing its cards.
+    """
     data_changed = pyqtSignal()
 
     def __init__(self):
@@ -80,8 +108,11 @@ class TableState(QObject):
         self.tablecards = HandModel()
         self.data_changed.emit()
 
-# Blinds
-class Blinds(QObject):
+
+class Blinds(QObject):  # NOT YET IMPLEMENTED
+    """
+    A class representing small and big blind.
+    """
     data_changed = pyqtSignal()
 
     def __init__(self, small, big):
@@ -90,11 +121,10 @@ class Blinds(QObject):
         self.big = int(big)
 
 
-class MoneyModel:
-    pass
-
-
 class GameModel(QObject):
+    """
+    A class containing all the information and actions to play a game of texas hold em.
+    """
     signal_bet = pyqtSignal(str)
     signal_call = pyqtSignal(str)
     signal_fold = pyqtSignal(str)
@@ -137,6 +167,9 @@ class GameModel(QObject):
             player.hand.add_card((self.deck.draw()))
 
     def who_is_active(self):
+        """
+        A method returning a list with the active and not active players. First player is the active one.
+        """
         for player in self.PlayerStates:
             if player.active:
                 active_player = player
@@ -145,9 +178,14 @@ class GameModel(QObject):
                 not_active_player = player
                 player.hand.flipped_cards = False
         self.data_changed.emit()
+
         return active_player, not_active_player
 
     def new_card_event(self):
+        """
+        A method that puts additional cards on the table depending on the state of the game. Also sets the start player
+        as active.
+        """
         self.PlayerStates[0].bet = 0
         self.PlayerStates[1].bet = 0
 
@@ -169,6 +207,9 @@ class GameModel(QObject):
                 player.set_active(False)
 
     def fold(self):
+        """
+        A method that makes the active player fold.
+        """
         self.PlayerStates[0].hand.flipped_cards = False
         self.PlayerStates[1].hand.flipped_cards = False
         self.PlayerStates[0].data_changed.emit()
@@ -181,6 +222,9 @@ class GameModel(QObject):
         self.data_changed.emit()
 
     def all_in(self):
+        """
+        A method that makes the active player go all in
+        """
         players = self.who_is_active()
         amount = players[0].money
         if players[0].money + players[0].bet > players[1].money + players[1].bet:
@@ -210,7 +254,9 @@ class GameModel(QObject):
             self.data_changed.emit()
 
     def bet(self, raise_amount):
-
+        """
+        A method that makes the active player bet with a given amount.
+        """
         players = self.who_is_active()
         amount = int(raise_amount) + int(players[1].bet) - int(players[0].bet)
         if int(amount) > players[0].money:
@@ -235,6 +281,9 @@ class GameModel(QObject):
             self.data_changed.emit()
 
     def call(self):
+        """
+        A method that makes the active player call the current bet or check.
+        """
         players = self.who_is_active()
         if players[0].bet == players[1].bet and players[0].active != players[0].started:
             self.signal_call.emit(f"{players[0].name} checked")
@@ -261,7 +310,10 @@ class GameModel(QObject):
         self.data_changed.emit()
 
     def evaluate_winner(self):
-
+        """
+        A method that evaluates the winner of the round. Shows both of the players cards and emits a signal with information
+        regarding the players PokerHands.
+        """
         self.PlayerStates[0].hand.flipped_cards = False
         self.PlayerStates[1].hand.flipped_cards = False
         self.PlayerStates[0].data_changed.emit()
@@ -281,20 +333,18 @@ class GameModel(QObject):
             self.signal_winner.emit(hand_string+f'{self.PlayerStates[1].name} wins the pot of {self.pot}!')
 
         else:
-
             self.signal_winner.emit(hand_string+f'The pot of {self.pot} is split between the players.')
-
             self.PlayerStates[0].won(self.pot/2)
             self.PlayerStates[1].won(self.pot/2)
 
         self.data_changed.emit()
 
         if self.PlayerStates[0].money == 0:
-            print(f'The Winner of The Game is {self.PlayerStates[1].name}')
             self.signal_endgame.emit(f"The Winner of The game is {self.PlayerStates[1].name}")
+
         elif self.PlayerStates[1].money == 0:
-            print(f'The Winner of The Game is {self.PlayerStates[0].name}')
             self.signal_endgame.emit(f"The Winner of The game is {self.PlayerStates[0].name}")
+
         else:
             self.next_round()
 
@@ -310,7 +360,8 @@ class GameModel(QObject):
 
     def next_round(self):
         """
-        Resets the pot and player bets. Sets the new starting player as active.
+        Resets the pot and player bets. Sets the new starting player as active. Makes sure that the new starting has
+        cards face up.
         """
         self.signal_endround.emit()
         self.pot = 0
@@ -325,12 +376,13 @@ class GameModel(QObject):
             player.hand.add_card(self.deck.draw())
             player.data_changed.emit()
 
-        #Kolla vem som började senast
+        # Check who started the last time.
         for player in self.PlayerStates:
             if player.started:
                 player.set_starter(False)
                 player.set_active(False)
                 player.hand.flipped_cards = True
+
             else:
                 player.set_starter(True)
                 player.set_active(True)
