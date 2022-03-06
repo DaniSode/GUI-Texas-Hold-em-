@@ -306,15 +306,17 @@ class InformationView(QVBoxLayout):
 
         self.player_turn = QLabel()
         self.player_turn.setAlignment(Qt.AlignCenter)
-        self.player_turn.setFont(QFont('Constantia', 16))
+        self.player_turn.setFont(QFont('Constantia', 14))
         self.player_turn.setStyleSheet("color: #35322f")
 
         self.text = QLabel()
         self.text.setFrameStyle(QFrame.Panel | QFrame.Raised)
-        self.text.setFont(QFont('Constantia', 16))
+        self.text.setFont(QFont('Constantia', 12))
         self.text.setAlignment(Qt.AlignCenter)
-        screen = app.primaryScreen()
-        self.text.setFixedSize(int(screen.size().width() * 0.15), int(screen.size().height() * 0.1))
+        # screen = app.primaryScreen()
+        # self.text.setFixedSize(int(screen.size().width() * 0.15), int(screen.size().height() * 0.1))
+        # self.text.setFixedWidth(int(screen.size().width() * 0.15))
+        self.text.setWordWrap(True)
         self.setAlignment(Qt.AlignCenter)
         self.addWidget(self.text)
         self.addWidget(self.player_turn)
@@ -442,12 +444,6 @@ class MainGameWindow(QMainWindow):
         h_layout.addStretch(1)
 
         # Lower middle row
-
-
-
-
-
-
         h_lay = QVBoxLayout()
         h_lay.addLayout(PotInformation(game))
         h_lay.addStretch(1)

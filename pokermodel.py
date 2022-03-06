@@ -169,7 +169,7 @@ class GameModel(QObject):
     def fold(self):
         players = self.who_is_active()
         self.signal_fold.emit(f"{players[0].name} folded")
-        self.signal_fold.emit(f"Winner is and the pot of {self.pot}\ngoes to {players[1].name}")
+        self.signal_fold.emit(f"Winner is and the pot of {self.pot} goes to {players[1].name}")
         players[1].won(self.pot)
         players[1].data_changed.emit()
         self.next_round()
@@ -179,7 +179,7 @@ class GameModel(QObject):
         players = self.who_is_active()
         amount = players[0].money
         if players[0].money + players[0].bet > players[1].money + players[1].bet:
-            self.signal_all_in.emit("You can't bet more than\nyour opponent's money!")
+            self.signal_all_in.emit("You can't bet more than your opponent's money!")
         elif players[0].money + players[0].bet == players[1].bet:
             self.pot += int(amount)
             players[0].bet += int(amount)
@@ -209,18 +209,18 @@ class GameModel(QObject):
         players = self.who_is_active()
         amount = int(raise_amount) + int(players[1].bet) - int(players[0].bet)
         if int(amount) > players[0].money:
-            self.signal_bet.emit("You don't have enough money\nTry a smaller bet!")
+            self.signal_bet.emit("You don't have enough money!\nTry a smaller bet!")
         elif int(amount) == 0 or amount == '':
-            self.signal_bet.emit("You need to atleast bet 1\nor check!")
+            self.signal_bet.emit("You need to atleast bet 1 or check!")
         elif int(amount) - players[0].money == 0:
-            self.signal_bet.emit("Are you sure you want to\ngo all in?\nPress All In button")
+            self.signal_bet.emit("Are you sure you want to go all in?\nPress All In button")
         elif int(amount) > players[1].money + players[1].bet:
-            self.signal_bet.emit("You can't bet more than\nyour opponent's money\nTry a smaller bet!")
+            self.signal_bet.emit("You can't bet more than your opponent's money!\nTry a smaller bet!")
         else:
             if players[0].bet == players[1].bet:
                 self.signal_bet.emit(f"{players[0].name} bet {amount}")
             else:
-                self.signal_bet.emit(f"{players[0].name} called {players[1].name} and\nraised them {int(raise_amount)}")
+                self.signal_bet.emit(f"{players[0].name} called {players[1].name} and raised them {int(raise_amount)}")
 
             self.pot += int(amount)
             players[0].bet += int(amount)
@@ -237,11 +237,6 @@ class GameModel(QObject):
         elif players[0].bet == players[1].bet:
             self.signal_call.emit(f"{players[0].name} checked")
             self.next_player()
-        elif self.PlayerStates[0].money == 0 or self.PlayerStates[1].money == 0:
-            while len(self.tablestate.tablecards.cards) != 5:
-                self.new_card_event()
-            self.evaluate_winner()
-            self.data_changed.emit()
         else:
             diff_amount = players[1].bet-players[0].bet
             players[0].bet += diff_amount
@@ -249,7 +244,13 @@ class GameModel(QObject):
             self.pot += diff_amount
             self.signal_call.emit(f"{players[0].name} called {players[1].name}")
             if players[0].money == 0:
-                self.all_in()
+                self.signal_call.emit("Are you sure you want to go all in?\nPress All In button")
+                return
+            if players[1].money == 0:
+                while len(self.tablestate.tablecards.cards) != 5:
+                    self.new_card_event()
+                self.evaluate_winner()
+                return
             self.new_card_event()
         players[0].data_changed.emit()
         self.data_changed.emit()
@@ -273,10 +274,10 @@ class GameModel(QObject):
 
         if self.PlayerStates[0].money == 0:
             print(f'The Winner of The Game is {self.PlayerStates[1].name}')
-
+            self.signal_endgame.emit(f"The Winner of The game is {self.PlayerStates[1].name}")
         elif self.PlayerStates[1].money == 0:
             print(f'The Winner of The Game is {self.PlayerStates[0].name}')
-            quit()
+            self.signal_endgame.emit(f"The Winner of The game is {self.PlayerStates[0].name}")
         else:
             self.next_round()
 
@@ -294,7 +295,6 @@ class GameModel(QObject):
         """
         Resets the pot and player bets. Sets the new starting player as active.
         """
-        self.endround = False
         self.pot = 0
         self.deck = StandardDeck()
         self.deck.shuffle()
