@@ -311,11 +311,10 @@ class InformationView(QVBoxLayout):
 
         self.text = QLabel()
         self.text.setFrameStyle(QFrame.Panel | QFrame.Raised)
-        self.text.setFont(QFont('Constantia', 12))
+        self.text.setFont(QFont('Constantia', 10))
         self.text.setAlignment(Qt.AlignCenter)
-        # screen = app.primaryScreen()
-        # self.text.setFixedSize(int(screen.size().width() * 0.15), int(screen.size().height() * 0.1))
-        # self.text.setFixedWidth(int(screen.size().width() * 0.15))
+        screen = app.primaryScreen()
+        self.text.setFixedSize(int(screen.size().width() * 0.15), int(screen.size().height() * 0.1))
         self.text.setWordWrap(True)
         self.setAlignment(Qt.AlignCenter)
         self.addWidget(self.text)
@@ -327,7 +326,7 @@ class InformationView(QVBoxLayout):
         self.game.signal_call.connect(self.update_view_call)
         self.game.signal_fold.connect(self.update_view_fold)
         self.game.signal_all_in.connect(self.update_view_all_in)
-        self.game.signal_winner.connect(self.update_end_of_round)
+        self.game.signal_winner.connect(self.update_winner)
         self.game.signal_endgame.connect(self.end_game)
 
     def update_view(self):
@@ -351,16 +350,20 @@ class InformationView(QVBoxLayout):
 
         self.text.setText(text)
 
-    def update_end_of_round(self, text):
+    def update_winner(self, text):
 
         self.text.setText(text)
-
+        end_box = QMessageBox()
+        end_box.setWindowTitle('Round finished')
+        end_box.setText("Press ok to move on to the next round!")
+        end_box.exec()
+        self.text.setText('')
 
     def end_game(self, text):
 
-
         end_box = QMessageBox()
         end_box.setWindowTitle('Game finished')
+
         end_box.setText(text)
         end_box.exec()
         quit()

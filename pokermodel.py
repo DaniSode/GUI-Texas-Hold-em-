@@ -169,9 +169,12 @@ class GameModel(QObject):
                 player.set_active(False)
 
     def fold(self):
+        self.PlayerStates[0].hand.flipped_cards = False
+        self.PlayerStates[1].hand.flipped_cards = False
+        self.PlayerStates[0].data_changed.emit()
+        self.PlayerStates[1].data_changed.emit()
         players = self.who_is_active()
-        self.signal_fold.emit(f"{players[0].name} folded")
-        self.signal_fold.emit(f"Winner is and the pot of {self.pot} goes to {players[1].name}")
+        self.signal_winner.emit(f"{players[0].name} folded!\n{players[1].name} wins the pot of {self.pot}.")
         players[1].won(self.pot)
         players[1].data_changed.emit()
         self.next_round()
@@ -258,6 +261,12 @@ class GameModel(QObject):
         self.data_changed.emit()
 
     def evaluate_winner(self):
+
+        self.PlayerStates[0].hand.flipped_cards = False
+        self.PlayerStates[1].hand.flipped_cards = False
+        self.PlayerStates[0].data_changed.emit()
+        self.PlayerStates[1].data_changed.emit()
+
         bph0 = self.PlayerStates[0].hand.best_poker_hand(self.tablestate.tablecards.cards)
         bph1 = self.PlayerStates[1].hand.best_poker_hand(self.tablestate.tablecards.cards)
 
@@ -320,7 +329,9 @@ class GameModel(QObject):
             if player.started:
                 player.set_starter(False)
                 player.set_active(False)
+                player.hand.flipped_cards = True
             else:
                 player.set_starter(True)
                 player.set_active(True)
+                player.hand.flipped_cards = False
         self.data_changed.emit()
