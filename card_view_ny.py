@@ -327,6 +327,7 @@ class InformationView(QVBoxLayout):
         self.game.signal_fold.connect(self.update_view_fold)
         self.game.signal_all_in.connect(self.update_view_all_in)
         self.game.signal_winner.connect(self.update_winner)
+        self.game.signal_endround.connect(self.update_end_of_round)
         self.game.signal_endgame.connect(self.end_game)
 
     def update_player(self):
@@ -353,6 +354,8 @@ class InformationView(QVBoxLayout):
     def update_winner(self, text):
 
         self.text.setText(text)
+
+    def update_end_of_round(self):
         end_box = QMessageBox()
         end_box.setWindowTitle('Round finished')
         end_box.setText("Press ok to move on to the next round!")

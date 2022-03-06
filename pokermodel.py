@@ -100,8 +100,8 @@ class GameModel(QObject):
     signal_fold = pyqtSignal(str)
     signal_all_in = pyqtSignal(str)
     signal_winner = pyqtSignal(str)
+    signal_endround = pyqtSignal()
     signal_endgame = pyqtSignal(str)
-    signal_endround = pyqtSignal(int)
     data_changed = pyqtSignal()
 
     def __init__(self):
@@ -312,6 +312,7 @@ class GameModel(QObject):
         """
         Resets the pot and player bets. Sets the new starting player as active.
         """
+        self.signal_endround.emit()
         self.pot = 0
         self.deck = StandardDeck()
         self.deck.shuffle()
