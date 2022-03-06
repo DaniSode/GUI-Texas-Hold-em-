@@ -165,7 +165,6 @@ class PlayerView(QHBoxLayout):
 
     def __init__(self, player_number, game):
         super().__init__()
-        #self.player_state = player_state
         self.game = game
         self.player_number = player_number
         hand = self.game.PlayerStates[self.player_number].hand
@@ -184,6 +183,7 @@ class PlayerView(QHBoxLayout):
         self.player_name.setFont(QFont('Felix Titling'))
         self.player_name.setStyleSheet('padding: 3px 0px; font-weight: bold')
         self.money_box = DisplayBox(f'Money: {self.game.PlayerStates[self.player_number].money}')
+        self.blind_box = DisplayBox(f'{self.game.PlayerStates[self.player_number].bet}-blind')
         self.bet_box = DisplayBox(f'Bet: {self.game.PlayerStates[self.player_number].bet}')
         self.flip_button = QPushButton('Flip cards')
         self.flip_button.clicked.connect(lambda x, checked=True: hand.flip())
@@ -339,12 +339,20 @@ class SetupView(QVBoxLayout):
         self.lbl_box_1 = LabelAndBox('Name Player 1:')
         self.lbl_box_2 = LabelAndBox('Name Player 2:')
         self.lbl_box_3 = LabelAndBox('Stake:')
+        self.lbl_box_4 = LabelAndBox('Small-blind:')
+        self.lbl_box_5 = LabelAndBox('Big-blind:')
         self.lbl_box_3.enter_info.setValidator(QIntValidator(0, 10000000000))
+        self.lbl_box_4.enter_info.setValidator(QIntValidator(0, 10000000000))
+        self.lbl_box_5.enter_info.setValidator(QIntValidator(0, 10000000000))
         self.addLayout(self.lbl_box_1)
         self.addStretch(1)
         self.addLayout(self.lbl_box_2)
         self.addStretch(1)
         self.addLayout(self.lbl_box_3)
+        self.addStretch(1)
+        self.addLayout(self.lbl_box_4)
+        self.addStretch(1)
+        self.addLayout(self.lbl_box_5)
         self.addStretch(1)
 
     def get_text(self):
@@ -354,7 +362,11 @@ class SetupView(QVBoxLayout):
             self.lbl_box_2.enter_info.setText('Player 2')
         if self.lbl_box_3.enter_info.text() == '':
             self.lbl_box_3.enter_info.setText('100')
-        return self.lbl_box_1.enter_info.text(), self.lbl_box_2.enter_info.text(), self.lbl_box_3.enter_info.text()
+        if self.lbl_box_4.enter_info.text() == '':
+            self.lbl_box_4.enter_info.setText('10')
+        if self.lbl_box_4.enter_info.text() == '':
+            self.lbl_box_4.enter_info.setText('20')
+        return self.lbl_box_1.enter_info.text(), self.lbl_box_2.enter_info.text(), self.lbl_box_3.enter_info.text(), self.lbl_box_4.enter_info.text(), self.lbl_box_5.enter_info.text()
 
 
 class SetupWindow(QMainWindow):
