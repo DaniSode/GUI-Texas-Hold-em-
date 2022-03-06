@@ -149,10 +149,6 @@ class GameModel(QObject):
         self.PlayerStates[0].bet = 0
         self.PlayerStates[1].bet = 0
 
-        if self.PlayerStates[0].money == 0 and self.PlayerStates[0].bet == 0:
-            while len(self.tablestate.tablecards.cards) != 5:
-                self.tablestate.tablecards.add_card(self.deck.draw())
-
         if len(self.tablestate.tablecards.cards) == 0:
             self.tablestate.tablecards.add_card(self.deck.draw())
             self.tablestate.tablecards.add_card(self.deck.draw())
@@ -190,6 +186,11 @@ class GameModel(QObject):
             players[0].money -= int(amount)
             players[0].data_changed.emit()
             self.signal_all_in.emit(f'{players[0].name} is all in!')
+            while len(self.tablestate.tablecards.cards) != 5:
+                self.new_card_event()
+            self.evaluate_winner()
+            self.data_changed.emit()
+        elif self.PlayerStates[0].money == 0 or self.PlayerStates[0].money == 0:
             while len(self.tablestate.tablecards.cards) != 5:
                 self.new_card_event()
             self.evaluate_winner()
@@ -236,6 +237,11 @@ class GameModel(QObject):
         elif players[0].bet == players[1].bet:
             self.signal_call.emit(f"{players[0].name} checked")
             self.next_player()
+        elif self.PlayerStates[0].money == 0 or self.PlayerStates[1].money == 0:
+            while len(self.tablestate.tablecards.cards) != 5:
+                self.new_card_event()
+            self.evaluate_winner()
+            self.data_changed.emit()
         else:
             diff_amount = players[1].bet-players[0].bet
             players[0].bet += diff_amount
