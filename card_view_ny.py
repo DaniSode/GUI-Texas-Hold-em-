@@ -308,37 +308,24 @@ class InformationView(QVBoxLayout):
         self.text.setFont(QFont('Constantia', 16))
         self.text.setAlignment(Qt.AlignCenter)
         screen = app.primaryScreen()
-        self.text.setFixedSize(int(screen.size().width() * 0.15), int(screen.size().height() * 0.15))
+        self.text.setFixedSize(int(screen.size().width() * 0.15), int(screen.size().height() * 0.1))
         self.setAlignment(Qt.AlignCenter)
         self.addWidget(self.text)
 
         self.game.data_changed.connect(self.update_view)
-        self.game.signal.connect(self.update_view_1)
+        self.game.signal_bet.connect(self.update_view_bet)
+        self.game.signal_call.connect(self.update_view_call)
+        self.game.signal_fold.connect(self.update_view_fold)
+        self.game.signal_all_in.connect(self.update_view_all_in)
 
     def update_view(self):
 
         test = [player.name for player in self.game.PlayerStates if player.active]
         self.text.setText(f"Player 2 betar 70\n{test[0]}'s turn")
 
-    def update_view_bet(self):
+    def update_view_bet(self, text):
 
-        players = self.game.who_is_active()
-        amount = int(raise_amount) + int(players[1].bet) - int(players[0].bet)
-        if int(amount) > players[0].money:
-            self.text.setText("You don't have enough money\nTry a smaller bet!")
-        elif int(amount) == 0 or amount == '':
-            self.text.setText("You need to atleast bet 1 or check!")
-        # elif int(amount) <= players[1].bet-players[0].bet:
-        #     print("You need to call your opponent or raise them!")
-        elif int(amount)-players[0].money == 0:
-            self.text.setText("Are you sure you want to go all in?\nPress All in button")
-        elif int(amount) > players[1].money:
-            self.text.setText("You can't bet more than your opponent's money\nTry a smaller bet!")
-        else:
-            if players[0].bet == players[1].bet:
-                self.text.setText(f"{players[0].name} bet {amount}\n{players[1].name}'s turn")
-            else:
-                self.text.setText(f"{players[0].name} called {players[1].name} and raised {int(raise_amount)}\n{players[1].name}'s turn")
+        self.text.setText(text)
 
 
 class LabelAndBox(QVBoxLayout):
@@ -413,7 +400,6 @@ class SetupWindow(QMainWindow):
 
     def proceed_to_main(self):
         self.GameModel.start_game(self.layout.get_text())
-        print(self.layout.get_text())
         self.w = MainGameWindow(self.GameModel)
         self.w.show()
         self.close()
