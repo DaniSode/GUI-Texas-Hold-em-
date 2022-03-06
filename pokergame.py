@@ -1,4 +1,3 @@
-#
 from pokermodel import *
 from card_view_ny import *
 import sys

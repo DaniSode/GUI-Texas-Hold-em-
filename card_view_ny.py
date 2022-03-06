@@ -403,6 +403,8 @@ class SetupView(QVBoxLayout):
         self.addStretch(1)
         self.addLayout(self.lbl_box_3)
         self.addStretch(1)
+
+        # In case of implementing blinds
         # self.addLayout(self.lbl_box_4)
         # self.addStretch(1)
         # self.addLayout(self.lbl_box_5)
@@ -415,10 +417,13 @@ class SetupView(QVBoxLayout):
             self.lbl_box_2.enter_info.setText('Player 2')
         if self.lbl_box_3.enter_info.text() == '':
             self.lbl_box_3.enter_info.setText('100')
+
+            # In case of implementing blinds
         # if self.lbl_box_4.enter_info.text() == '':
         #     self.lbl_box_4.enter_info.setText('10')
         # if self.lbl_box_5.enter_info.text() == '':
         #     self.lbl_box_5.enter_info.setText('20')
+
         return self.lbl_box_1.enter_info.text(), self.lbl_box_2.enter_info.text(), self.lbl_box_3.enter_info.text(), self.lbl_box_4.enter_info.text(), self.lbl_box_5.enter_info.text()
 
 

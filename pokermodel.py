@@ -121,7 +121,7 @@ class GameModel(QObject):
         self.PlayerStates.append(PlayerState(player_infos[0], player_infos[2]))
         self.PlayerStates.append(PlayerState(player_infos[1], player_infos[2]))
 
-        # Blinds
+        # In case of implementing blinds
         # self.blinds = Blinds(player_infos[-2], player_infos[-1])
         # self.PlayerStates[0].bet += self.blinds.small
         # self.PlayerStates[1].bet += self.blinds.big
