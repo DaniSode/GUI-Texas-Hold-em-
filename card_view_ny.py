@@ -364,8 +364,8 @@ class SetupView(QVBoxLayout):
             self.lbl_box_3.enter_info.setText('100')
         if self.lbl_box_4.enter_info.text() == '':
             self.lbl_box_4.enter_info.setText('10')
-        if self.lbl_box_4.enter_info.text() == '':
-            self.lbl_box_4.enter_info.setText('20')
+        if self.lbl_box_5.enter_info.text() == '':
+            self.lbl_box_5.enter_info.setText('20')
         return self.lbl_box_1.enter_info.text(), self.lbl_box_2.enter_info.text(), self.lbl_box_3.enter_info.text(), self.lbl_box_4.enter_info.text(), self.lbl_box_5.enter_info.text()
 
 
@@ -391,6 +391,7 @@ class SetupWindow(QMainWindow):
 
     def proceed_to_main(self):
         self.GameModel.start_game(self.layout.get_text())
+        print(self.layout.get_text())
         self.w = MainGameWindow(self.GameModel)
         self.w.show()
         self.close()

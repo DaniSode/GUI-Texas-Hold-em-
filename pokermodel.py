@@ -81,13 +81,14 @@ class TableState(QObject):
         self.tablecards = HandModel()
         self.data_changed.emit()
 
-
+# Blinds
 class Blinds(QObject):
     data_changed = pyqtSignal()
 
     def __init__(self, blinds):
         super().__init__()
-        self.blinds = blinds
+        self.small = int(small)
+        self.big = int(big)
 
 
 class MoneyModel:
@@ -113,6 +114,14 @@ class GameModel(QObject):
         """
         self.PlayerStates.append(PlayerState(player_infos[0], player_infos[2]))
         self.PlayerStates.append(PlayerState(player_infos[1], player_infos[2]))
+
+        # Blinds
+        self.blinds = Blinds(player_infos[-2], player_infos[-1])
+        self.PlayerStates[0].bet += self.blinds.small
+        self.PlayerStates[1].bet += self.blinds.big
+        self.PlayerStates[0].money -= self.blinds.small
+        self.PlayerStates[1].money -= self.blinds.big
+
         self.data_changed.emit()
         self.PlayerStates[0].set_active(True)
         self.PlayerStates[0].set_starter(True)
@@ -249,7 +258,7 @@ class GameModel(QObject):
         self.data_changed.emit()
 
         if self.PlayerStates[0].money == 0:
-            print(f'The Winner of The Game is {self.PlayerStates[1].name}')
+            print_to_info(f'The Winner of The Game is {self.PlayerStates[1].name}')
             quit()
         elif self.PlayerStates[1].money == 0:
             print(f'The Winner of The Game is {self.PlayerStates[0].name}')
