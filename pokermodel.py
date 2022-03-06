@@ -387,4 +387,6 @@ class GameModel(QObject):
                 player.set_starter(True)
                 player.set_active(True)
                 player.hand.flipped_cards = False
+        self.PlayerStates[0].data_changed.emit()
+        self.PlayerStates[1].data_changed.emit()
         self.data_changed.emit()
