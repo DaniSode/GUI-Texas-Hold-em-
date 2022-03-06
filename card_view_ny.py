@@ -299,8 +299,9 @@ class HeaderView(QVBoxLayout):
 
 class InformationView(QVBoxLayout):
 
-    def __init__(self, game):
+    def __init__(self, game, action_view):
         super().__init__()
+        self.action_view = action_view
         self.game = game
         self.text = QLabel()
         self.text.setFrameStyle(QFrame.Panel | QFrame.Raised)
@@ -434,13 +435,25 @@ class MainGameWindow(QMainWindow):
         h_layout.addStretch(1)
 
         # Lower middle row
-        h_lay = QVBoxLayout()
-        h_lay.addLayout(PotInformation(game))
-        h_lay.addStretch(1)
-        h_lay.addLayout(InformationView(game))
-        h_lay.addStretch(1)
-        h_lay.addLayout(ActionsView(game))
-        h_layout.addLayout(h_lay)
+        action_view = ActionsView(game)
+
+        # h_lay = QVBoxLayout()
+        # h_lay.addLayout(PotInformation(game))
+        # h_lay.addStretch(1)
+        # h_lay.addLayout(InformationView(game))
+        # h_lay.addStretch(1)
+        # h_lay.addLayout(ActionsView(game))
+        # h_layout.addLayout(h_lay)
+
+
+        # OLD
+        # h_lay = QVBoxLayout()
+        # h_lay.addLayout(PotInformation(game))
+        # h_lay.addStretch(1)
+        # h_lay.addLayout(InformationView(game))
+        # h_lay.addStretch(1)
+        # h_lay.addLayout(ActionsView(game))
+        # h_layout.addLayout(h_lay)
 
         # Lower right row
         h_layout.addStretch(1)
