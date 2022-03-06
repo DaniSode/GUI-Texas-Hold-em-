@@ -85,7 +85,7 @@ class TableState(QObject):
 class Blinds(QObject):
     data_changed = pyqtSignal()
 
-    def __init__(self, blinds):
+    def __init__(self, small, big):
         super().__init__()
         self.small = int(small)
         self.big = int(big)
@@ -107,6 +107,7 @@ class GameModel(QObject):
         self.deck = StandardDeck()
         self.deck.shuffle()
         self.tablestate = TableState()
+        self.blinds = []
 
     def start_game(self, player_infos):
         """
