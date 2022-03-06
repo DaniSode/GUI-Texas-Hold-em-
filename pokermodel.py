@@ -100,6 +100,8 @@ class GameModel(QObject):
     signal_call = pyqtSignal(str)
     signal_fold = pyqtSignal(str)
     signal_all_in = pyqtSignal(str)
+    signal_winner = pyqtSignal(str)
+    signal_endgame = pyqtSignal(str)
     data_changed = pyqtSignal()
 
     def __init__(self):
@@ -258,18 +260,24 @@ class GameModel(QObject):
     def evaluate_winner(self):
         bph0 = self.PlayerStates[0].hand.best_poker_hand(self.tablestate.tablecards.cards)
         bph1 = self.PlayerStates[1].hand.best_poker_hand(self.tablestate.tablecards.cards)
-        print(f'{self.PlayerStates[0].name} has {str(bph0)}')
-        print(f'{self.PlayerStates[1].name} has {str(bph1)}')
+
+        hand_string = f'{self.PlayerStates[0].name} has {str(bph0)}, {self.PlayerStates[1].name} has {str(bph1)}. '
+
         if bph0 > bph1:
             self.PlayerStates[0].won(self.pot)
-            print(f'Winner is and the pot of {self.pot} goes to {self.PlayerStates[0].name}')
+            self.signal_winner.emit(hand_string+f'{self.PlayerStates[0].name} wins the pot of {self.pot}!')
+
         elif bph1 > bph0:
             self.PlayerStates[1].won(self.pot)
-            print(f'Winner is and the pot of {self.pot} goes to {self.PlayerStates[1].name}')
+            self.signal_winner.emit(hand_string+f'{self.PlayerStates[1].name} wins the pot of {self.pot}!')
+
         else:
+
+            self.signal_winner.emit(hand_string+f'The pot of {self.pot} is split between the players.')
+
             self.PlayerStates[0].won(self.pot/2)
             self.PlayerStates[1].won(self.pot/2)
-            print('split pot')
+
         self.data_changed.emit()
 
         if self.PlayerStates[0].money == 0:
