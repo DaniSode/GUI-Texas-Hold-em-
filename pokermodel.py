@@ -96,7 +96,7 @@ class MoneyModel:
 
 
 class GameModel(QObject):
-    end = pyqtSignal()
+    signal = pyqtSignal()
     data_changed = pyqtSignal()
 
     def __init__(self):
@@ -118,10 +118,10 @@ class GameModel(QObject):
 
         # Blinds
         self.blinds = Blinds(player_infos[-2], player_infos[-1])
-        self.PlayerStates[0].bet += self.blinds.small
-        self.PlayerStates[1].bet += self.blinds.big
-        self.PlayerStates[0].money -= self.blinds.small
-        self.PlayerStates[1].money -= self.blinds.big
+        self.PlayerStates[1].bet += self.blinds.small
+        self.PlayerStates[0].bet += self.blinds.big
+        self.PlayerStates[1].money -= self.blinds.small
+        self.PlayerStates[0].money -= self.blinds.big
 
         self.data_changed.emit()
         self.PlayerStates[0].set_active(True)
@@ -196,30 +196,28 @@ class GameModel(QObject):
             self.next_player()
             self.data_changed.emit()
 
+    def bet_ok(self, raise_amount):
+
+        players = self.who_is_active()
+        amount = int(raise_amount) + int(players[1].bet) - int(players[0].bet)
+        if int(amount) > players[0].money or int(amount) == 0 or amount == '' or int(amount)-players[0].money == 0 or \
+                int(amount) > players[1].money:
+            return False
+        else:
+            return True
+
     def bet(self, raise_amount):
         players = self.who_is_active()
         amount = int(raise_amount) + int(players[1].bet) - int(players[0].bet)
-        if int(amount) > players[0].money:
-            print("You don't have enough money!")
-        elif int(amount) == 0 or amount == '':
-            print("You need to atleast bet 1 or check!")
-        elif int(amount) <= players[1].bet-players[0].bet:
-            print("You need to call your opponent or raise them!")
-        elif int(amount)-players[0].money == 0:
-            print("Are you sure you want to go all in?")
-        elif int(amount) > players[1].money:
-            print("You can't bet more than your opponent's money")
-        else:
-            if players[0].bet == players[1].bet:
-                print(f'{players[0].name} bet {amount}')
-            else:
-                print(f'{players[0].name} called {players[1].name} and raised {int(raise_amount)}')
+        if self.bet_ok(raise_amount):
             self.pot += int(amount)
             players[0].bet += int(amount)
             players[0].money -= int(amount)
             players[0].data_changed.emit()
             self.next_player()
             self.data_changed.emit()
+        else:
+            self.signal.emit()
 
     def call(self):
         players = self.who_is_active()
